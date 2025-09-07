@@ -99,7 +99,7 @@ export class ProductService {
   // Helper method to get product image URL
   getProductImageUrl(images?: string[]): string {
   if (!images || images.length === 0) {
-    return 'assets/default-product.png'; // fallback image
+    return 'assets/default-product.svg'; // fallback image
   }
   return images[0];
 }

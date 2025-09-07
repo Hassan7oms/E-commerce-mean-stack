@@ -11,6 +11,7 @@ const FaQRouter= require('./routes/FAQ-router');
 const wishlistRouter= require('./routes/wishlist-router')
 const categoryRouter=require('./routes/category-router');
 const cartRouter=require('./routes/cart-router');
+const orderRouter=require('./routes/order-router');
 const app = express();
 app.use("/uploads",express.static(path.join(__dirname,'uploads')));
 app.use(express.json());
@@ -39,6 +40,7 @@ app.use('/api/faq',FaQRouter);
 app.use('/api/wishlist',wishlistRouter);
 app.use('/api/category',categoryRouter);
 app.use('/api/cart',cartRouter);
+app.use('/api/orders',orderRouter);
 
 
 

@@ -212,7 +212,7 @@ export class ProductsPage implements OnInit {
 
   getProductImage(): string {
     if (!this.product?.images) {
-      return 'assets/default-product.png';
+      return 'assets/default-product.svg';
     }
 
     // Backend now always returns images as array with full URLs
@@ -225,7 +225,7 @@ export class ProductsPage implements OnInit {
       return this.product.images;
     }
 
-    return 'assets/default-product.png';
+    return 'assets/default-product.svg';
   }
 
   getCategoryName(category: any): string {

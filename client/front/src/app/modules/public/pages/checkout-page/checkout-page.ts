@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router } from '@angular/router';
 import { CartInterface } from '../../../../shared/models/cart.interface';
 import { CartService } from '../../../../core/services/cartService/cart.service';
+import { OrderService, CreateOrderRequest } from '../../../../core/services/orderService/order.service';
 
 @Component({
   selector: 'app-checkout-page',
@@ -20,6 +21,7 @@ export class CheckoutPage implements OnInit {
   constructor(
     private fb: FormBuilder,
     private cartService: CartService,
+    private orderService: OrderService,
     private router: Router
   ) {
     this.checkoutForm = this.fb.group({
@@ -28,7 +30,8 @@ export class CheckoutPage implements OnInit {
       area: ['', [Validators.required]],
       building: ['', [Validators.required]],
       apartment: ['', [Validators.required]],
-      paymentMethod: ['cod', [Validators.required]]
+      paymentMethod: ['cod', [Validators.required]],
+      notes: ['']
     });
   }
 
@@ -40,6 +43,9 @@ export class CheckoutPage implements OnInit {
     this.cartService.getCart().subscribe({
       next: (cartData) => {
         this.cart = cartData;
+        if (!this.cart || this.cart.items.length === 0) {
+          this.router.navigate(['/cart']);
+        }
       },
       error: (err) => {
         this.errorMessage = "Could not load your cart. Please try again.";
@@ -53,7 +59,7 @@ export class CheckoutPage implements OnInit {
       this.isLoading = true;
       this.errorMessage = '';
 
-      const orderData = {
+      const orderData: CreateOrderRequest = {
         shippingAddress: {
           street: this.checkoutForm.value.street,
           city: this.checkoutForm.value.city,
@@ -62,18 +68,31 @@ export class CheckoutPage implements OnInit {
           apartment: this.checkoutForm.value.apartment
         },
         paymentMethod: this.checkoutForm.value.paymentMethod,
-        cartId: this.cart._id
+        cartId: this.cart._id,
+        notes: this.checkoutForm.value.notes || ''
       };
 
-      // TODO: Implement order creation service call
-      console.log('Order data:', orderData);
-      
-      // Simulate order creation
-      setTimeout(() => {
-        this.isLoading = false;
-        // Navigate to order success page or show success message
-        this.router.navigate(['/order-success']);
-      }, 2000);
+      this.orderService.placeOrder(orderData).subscribe({
+        next: (response) => {
+          console.log('Order placed successfully:', response);
+          // Navigate to order success page or orders page
+          this.router.navigate(['/orders'], {
+            queryParams: { success: 'true', orderId: response.data._id }
+          });
+        },
+        error: (error) => {
+          this.isLoading = false;
+          console.error('Error placing order:', error);
+          
+          if (error.error?.message) {
+            this.errorMessage = error.error.message;
+          } else if (error.message) {
+            this.errorMessage = error.message;
+          } else {
+            this.errorMessage = 'Failed to place order. Please try again.';
+          }
+        }
+      });
       
     } else {
       this.markFormGroupTouched();

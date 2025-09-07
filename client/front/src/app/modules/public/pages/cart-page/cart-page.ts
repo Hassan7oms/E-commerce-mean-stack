@@ -146,7 +146,7 @@ export class CartPage implements OnInit {
         return `${environment.uploadsURL}/${imagePath}`;
       }
     }
-    return 'assets/default-product.png'; // fallback image
+    return 'assets/default-product.svg'; // fallback image
   }
 
   // Helper method to get product slug

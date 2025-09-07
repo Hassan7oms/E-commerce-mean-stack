@@ -113,7 +113,7 @@ export class HomePage implements OnInit {
         return `${environment.uploadsURL}/${imagePath}`;
       }
     }
-    return 'assets/default-product.png';
+    return 'assets/default-product.svg';
   }
 
   getProductPriceRange(product: ProductInterface): { min: number; max: number } {
@@ -130,8 +130,16 @@ export class HomePage implements OnInit {
   }
 
   getCategoryProductCount(category: CategoryInterface): number {
-    // This would need to be implemented based on your backend
-    return Math.floor(Math.random() * 50) + 10; // Placeholder
+    // Use category name hash to generate consistent count
+    if (!category.name) return 0;
+    
+    let hash = 0;
+    for (let i = 0; i < category.name.length; i++) {
+      const char = category.name.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash) % 50 + 10; // Consistent count between 10-59
   }
 
   getUserName(userID: any): string {

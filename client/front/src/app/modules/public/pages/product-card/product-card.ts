@@ -46,7 +46,7 @@ export class ProductCard {
         return `${environment.uploadsURL}/${imagePath}`;
       }
     }
-    return 'assets/default-product.png';
+    return 'assets/default-product.svg';
   }
 
   getCategoryName(): string {
