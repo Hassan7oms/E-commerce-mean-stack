@@ -149,6 +149,24 @@ export class HomePage implements OnInit {
     return 'Customer';
   }
 
+  getProductCategoryNames(product: ProductInterface): string {
+    if (!product.categoryID || !Array.isArray(product.categoryID)) {
+      return 'Uncategorized';
+    }
+    
+    // Check if categoryID is populated (array of objects) or just IDs (array of strings)
+    const categoryNames = product.categoryID.map((category: any) => {
+      if (typeof category === 'object' && category?.name) {
+        return category.name;
+      } else if (typeof category === 'string') {
+        return category; // This would be the category ID, you might want to handle this differently
+      }
+      return 'Unknown';
+    });
+    
+    return categoryNames.join(', ');
+  }
+
   // Newsletter subscription
   onNewsletterSubmit(event: Event): void {
     event.preventDefault();

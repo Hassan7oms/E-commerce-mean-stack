@@ -145,32 +145,36 @@
             </div>
             
             <!-- Products Grid -->
-            <div *ngIf="!isLoadingProducts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                <div *ngFor="let product of featuredProducts" class="product-card">
-                    <div class="product-image">
-                        <img [src]="getProductImageUrl(product)" 
-                             [alt]="product.title"
-                             loading="lazy">
-                        <div *ngIf="!isProductAvailable(product)" 
-                             style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;">
-                            <span style="background: white; color: var(--foreground); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
-                                Out of Stock
-                            </span>
+            <div *ngIf="!isLoadingProducts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <a *ngFor="let product of featuredProducts" 
+                   [routerLink]="['/product', product.slug]" 
+                   class="product-card-link">
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img [src]="getProductImageUrl(product)" 
+                                 [alt]="product.title"
+                                 loading="lazy">
+                            <div *ngIf= "!isProductAvailable(product)" 
+                                 style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;">
+                                <span style="background: white; color: var(--foreground); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
+                                    Out of Stock
+                                </span>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <p class="product-category">{{ getProductCategoryNames(product) }}</p>
+                            <h3 class="product-name">{{ product.title }}</h3>
+                            <div class="product-rating">
+                                <!-- You can add rating display here -->
+                            </div>
+                            <div class="product-price">
+                                <span class="price-current">{{ getProductPriceRange(product).min }} EGP</span>
+                                <span *ngIf="getProductPriceRange(product).min !== getProductPriceRange(product).max" 
+                                      class="price-original">{{ getProductPriceRange(product).max }} EGP</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="product-info">
-                        <p class="product-category">{{ product.categoryID }}</p>
-                        <h3 class="product-name">{{ product.title }}</h3>
-                        <div class="product-rating">
-                            <!-- You can add rating display here -->
-                        </div>
-                        <div class="product-price">
-                            <span class="price-current">{{ getProductPriceRange(product).min }} EGP</span>
-                            <span *ngIf="getProductPriceRange(product).min !== getProductPriceRange(product).max" 
-                                  class="price-original">{{ getProductPriceRange(product).max }} EGP</span>
-                        </div>
-                    </div>
-                </div>
+                </a>
             </div>
             
             <!-- No Products State -->
@@ -196,7 +200,7 @@
             
             <!-- Testimonials Grid -->
             <div *ngIf="!isLoadingTestimonials" class="grid grid-cols-1 md:grid-cols-3">
-                <div *ngFor="let testimonial of testimonials" class="testimonial-card">
+                <div *ngFor= "let testimonial of testimonials" class="testimonial-card">
                     <div class="testimonial-rating">
                         <div *ngFor="let star of [1,2,3,4,5]" 
                              [class]="star <= testimonial.rating ? 'star' : 'star empty'">

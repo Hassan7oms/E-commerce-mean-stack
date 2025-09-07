@@ -99,6 +99,16 @@ body {
   .lg\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
 }
 
+@media (min-width: 1280px) {
+  .xl\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .xl\:grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
+}
+
+/* Additional grid gap utilities */
+.gap-6 { gap: 1.5rem; }
+.gap-4 { gap: 1rem; }
+.gap-8 { gap: 2rem; }
+
 
 /* Generic Section Styles */
 .section {
