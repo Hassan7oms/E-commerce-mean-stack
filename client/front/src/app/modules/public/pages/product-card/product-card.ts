@@ -35,7 +35,16 @@ export class ProductCard {
 
   getProductImageUrl(): string {
     if (this.product?.images) {
-      return `${environment.uploadsURL}/${this.product.images}`;
+      // Handle both array and string formats
+      const imagePath = Array.isArray(this.product.images) ? this.product.images[0] : this.product.images;
+      if (imagePath) {
+        // If it's already a full URL, return it
+        if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+          return imagePath;
+        }
+        // Otherwise, build the URL
+        return `${environment.uploadsURL}/${imagePath}`;
+      }
     }
     return 'assets/default-product.png';
   }

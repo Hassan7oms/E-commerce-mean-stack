@@ -47,6 +47,11 @@ export class ApiService {
     return this.http.post<T>(`${this.baseUrl}${endpoint}`, formData, { headers });
   }
 
+  // Upload file with FormData using PUT method
+  uploadFilePut<T>(endpoint: string, formData: FormData, headers?: HttpHeaders): Observable<T> {
+    return this.http.put<T>(`${this.baseUrl}${endpoint}`, formData, { headers });
+  }
+
   // Get headers with authentication token
   getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
@@ -59,6 +64,7 @@ export class ApiService {
   // Get headers for file upload
   getUploadHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
+    // Don't set Content-Type for FormData - let browser set it with boundary
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });

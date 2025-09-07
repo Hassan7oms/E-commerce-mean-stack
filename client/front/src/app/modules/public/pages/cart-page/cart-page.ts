@@ -135,7 +135,16 @@ export class CartPage implements OnInit {
   getProductImageUrl(item: ICartItem): string {
     const productInterface = item.productID as ProductInterface;
     if (productInterface?.images) {
-      return `${environment.uploadsURL}/${productInterface.images}`;
+      // Handle both array and string formats
+      const imagePath = Array.isArray(productInterface.images) ? productInterface.images[0] : productInterface.images;
+      if (imagePath) {
+        // If it's already a full URL, return it
+        if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+          return imagePath;
+        }
+        // Otherwise, build the URL
+        return `${environment.uploadsURL}/${imagePath}`;
+      }
     }
     return 'assets/default-product.png'; // fallback image
   }

@@ -6,6 +6,7 @@ import { ProductService } from '../../../../core/services/productService/product
 import { CategoryService } from '../../../../core/services/categoryService/category.service';
 import { ProductInterface, IProductVariant, IProductAttributes } from '../../../../shared/models/product.interface';
 import { CategoryInterface } from '../../../../shared/models/category.interface';
+import { environment } from '../../../../../envirmonets/environment';
 
 @Component({
   selector: 'app-admin-products',
@@ -451,14 +452,24 @@ export class AdminProducts implements OnInit {
       return this.getPlaceholderImage();
     }
 
+    let imagePath: string | undefined;
+
     // Handle string case
     if (typeof product.images === 'string' && (product.images as string).trim() !== '') {
-      return product.images as string;
+      imagePath = product.images as string;
+    }
+    // Handle array case
+    else if (Array.isArray(product.images) && product.images.length > 0) {
+      imagePath = product.images[0];
     }
 
-    // Handle array case
-    if (Array.isArray(product.images) && product.images.length > 0) {
-      return product.images[0];
+    if (imagePath) {
+      // If it's already a full URL, return it
+      if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+      }
+      // Otherwise, build the URL
+      return `${environment.uploadsURL}/${imagePath}`;
     }
 
     // Return placeholder if no valid images

@@ -15,6 +15,26 @@
   margin: 0 0 2rem 0;
 }
 
+/* Error and Loading Banners */
+.error-banner {
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+  padding: 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  border: 1px solid hsl(0, 84%, 55%);
+}
+
+.loading-banner {
+  background: var(--muted);
+  color: var(--muted-foreground);
+  padding: 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
 .form-group {
   margin-bottom: 1.5rem;
 }
@@ -175,6 +195,138 @@
 
 .btn-outline:hover {
   background: var(--muted);
+}
+
+/* Image Upload Section */
+.image-upload-section {
+  margin: 2rem 0;
+}
+
+.image-upload-container {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  background: var(--muted);
+}
+
+.current-image {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.product-image-preview {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  z-index: 10;
+}
+
+.remove-image-btn:hover {
+  background: hsl(0, 84%, 55%);
+}
+
+.image-upload-area {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: var(--radius);
+  position: relative;
+}
+
+.image-upload-area:hover {
+  background: var(--accent);
+  border-color: var(--primary);
+}
+
+.upload-placeholder {
+  text-align: center;
+  color: var(--muted-foreground);
+}
+
+.upload-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.upload-placeholder p {
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
+}
+
+.upload-note {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.selected-image-preview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  position: relative;
+}
+
+.selected-image-info {
+  flex: 1;
+}
+
+.file-name {
+  font-weight: 500;
+  margin: 0 0 0.25rem 0;
+  color: var(--foreground);
+}
+
+.file-size {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.image-upload-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* Attributes Section */
+.attributes-section {
+  margin: 2rem 0;
+}
+
+.attributes-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 1rem;
+}
+
+.attributes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
 }
 
 /* Responsive */

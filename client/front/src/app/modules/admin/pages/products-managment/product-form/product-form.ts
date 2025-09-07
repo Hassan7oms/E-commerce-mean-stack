@@ -20,6 +20,12 @@ export class ProductForm implements OnInit {
   submitting = false;
   errorMessage = '';
 
+  // Image handling properties
+  selectedImageFile: File | null = null;
+  imagePreviewUrl: string | null = null;
+  currentImageUrl: string | null = null;
+  imageError: string = '';
+
   categories = [
     { _id: '1', name: 'Men' },
     { _id: '2', name: 'Women' }
@@ -94,28 +100,78 @@ export class ProductForm implements OnInit {
 
   loadProduct(id: string) {
     this.loading = true;
-    // For now, we'll simulate loading - in real implementation use productService.getProductById(id)
-    setTimeout(() => {
-      // Simulate loaded product data
-      const mockProduct = {
-        title: 'Sample Product',
-        slug: 'sample-product',
-        description: 'This is a sample product description',
-        categoryID: ['1'],
-        attributes: {
-          material: 'Cotton',
-          care: 'Machine wash',
-          origin: 'Egypt'
-        },
-        variant: [
-          { size: 'M', color: 'Blue', price: 299, QTyavailable: 10, reorderPoint: 5 },
-          { size: 'L', color: 'Red', price: 299, QTyavailable: 15, reorderPoint: 5 }
-        ]
-      };
+    
+    // Use product service to get product by ID
+    this.productService.getProductById(id).subscribe({
+      next: (product) => {
+        this.populateForm(product);
+        // Set current image if exists
+        if (product.images) {
+          if (typeof product.images === 'string') {
+            this.currentImageUrl = product.images;
+          } else if (Array.isArray(product.images) && product.images.length > 0) {
+            this.currentImageUrl = product.images[0];
+          }
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading product:', error);
+        this.errorMessage = 'Failed to load product. Please try again.';
+        this.loading = false;
+      }
+    });
+  }
+
+  // Image handling methods
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
       
-      this.populateForm(mockProduct);
-      this.loading = false;
-    }, 1000);
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        this.imageError = 'Please select a valid image file (JPG, PNG, GIF, WebP)';
+        return;
+      }
+      
+      // Validate file size (5MB max)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        this.imageError = 'Image size must be less than 5MB';
+        return;
+      }
+      
+      this.imageError = '';
+      this.selectedImageFile = file;
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.imagePreviewUrl = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeSelectedImage(event: Event): void {
+    event.stopPropagation();
+    this.selectedImageFile = null;
+    this.imagePreviewUrl = null;
+    this.imageError = '';
+  }
+
+  removeCurrentImage(): void {
+    this.currentImageUrl = null;
+  }
+
+  getFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
   populateForm(product: any) {
@@ -152,22 +208,52 @@ export class ProductForm implements OnInit {
         categoryID: [formData.categoryID] // Convert to array
       };
 
+      // Prepare images array
+      let images: File[] = [];
+      if (this.selectedImageFile) {
+        images = [this.selectedImageFile];
+      }
+
       console.log('Product data:', productData);
 
-      if (this.isEditMode) {
+      if (this.isEditMode && this.productId) {
         // Update product
-        setTimeout(() => {
-          console.log('Product updated successfully');
-          this.submitting = false;
-          this.router.navigate(['/admin/products']);
-        }, 1000);
+        // Include current image URL if no new image is selected
+        if (!this.selectedImageFile && this.currentImageUrl) {
+          productData.images = [this.currentImageUrl];
+        }
+        
+        this.productService.updateProduct(this.productId, productData, images).subscribe({
+          next: (response) => {
+            console.log('Product updated successfully:', response);
+            this.submitting = false;
+            this.router.navigate(['/admin/products']);
+          },
+          error: (error) => {
+            console.error('Error updating product:', error);
+            this.errorMessage = error.error?.message || 'Failed to update product. Please try again.';
+            this.submitting = false;
+          }
+        });
       } else {
         // Create new product
-        setTimeout(() => {
-          console.log('Product created successfully');
-          this.submitting = false;
-          this.router.navigate(['/admin/products']);
-        }, 1000);
+        const createData = {
+          ...productData,
+          images: images
+        };
+        
+        this.productService.createProduct(createData).subscribe({
+          next: (response) => {
+            console.log('Product created successfully:', response);
+            this.submitting = false;
+            this.router.navigate(['/admin/products']);
+          },
+          error: (error) => {
+            console.error('Error creating product:', error);
+            this.errorMessage = error.error?.message || 'Failed to create product. Please try again.';
+            this.submitting = false;
+          }
+        });
       }
     } else {
       this.markFormGroupTouched(this.productForm);

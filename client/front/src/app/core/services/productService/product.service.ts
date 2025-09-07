@@ -21,6 +21,11 @@ export class ProductService {
     return this.apiService.get<ProductInterface>(`/product/public/product/${slug}`);
   }
 
+  // Get product by ID (Admin only)
+  getProductById(id: string): Observable<ProductInterface> {
+    return this.apiService.getWithAuth<ProductInterface>(`/product/getproductbyid/${id}`);
+  }
+
   // Create new product (Admin only)
   createProduct(productData: {
     title: string;
@@ -39,11 +44,9 @@ export class ProductService {
     formData.append('attributes', JSON.stringify(productData.attributes));
     formData.append('variant', JSON.stringify(productData.variant));
     
-    // Append image files
-    if (productData.images && Array.isArray(productData.images)) {
-      productData.images.forEach(file => {
-        formData.append('images', file);
-      });
+    // Append single image file
+    if (productData.images && productData.images.length > 0) {
+      formData.append('image', productData.images[0]); // Use 'image' field name for single upload
     }
 
     return this.apiService.uploadFile<ProductInterface>('/product/addproduct', formData, this.apiService.getUploadHeaders());
@@ -60,6 +63,8 @@ export class ProductService {
         // Send existing images as a JSON string
         if (Array.isArray(value)) {
           formData.append('images', JSON.stringify(value));
+        } else if (typeof value === 'string') {
+          formData.append('images', JSON.stringify([value]));
         }
       } else if (key === 'categoryID' || key === 'attributes' || key === 'variant') {
         formData.append(key, JSON.stringify(value));
@@ -68,14 +73,12 @@ export class ProductService {
       }
     });
 
-    // Append new image files
+    // Append new image file (single)
     if (newImages.length > 0) {
-      newImages.forEach(file => {
-        formData.append('images', file);
-      });
+      formData.append('image', newImages[0]); // Use 'image' field name for single upload
     }
 
-    return this.apiService.put<ProductInterface>(`/product/updateproduct/${id}`, formData, this.apiService.getAuthHeaders());
+    return this.apiService.uploadFilePut<ProductInterface>(`/product/updateproduct/${id}`, formData, this.apiService.getUploadHeaders());
   }
 
   // Soft delete product (Admin only)

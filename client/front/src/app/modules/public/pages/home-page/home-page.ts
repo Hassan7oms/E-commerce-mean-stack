@@ -102,7 +102,16 @@ export class HomePage implements OnInit {
   // Helper methods for template
   getProductImageUrl(product: ProductInterface): string {
     if (product.images) {
-      return `${environment.uploadsURL}/${product.images}`;
+      // Handle both array and string formats
+      const imagePath = Array.isArray(product.images) ? product.images[0] : product.images;
+      if (imagePath) {
+        // If it's already a full URL, return it
+        if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+          return imagePath;
+        }
+        // Otherwise, build the URL
+        return `${environment.uploadsURL}/${imagePath}`;
+      }
     }
     return 'assets/default-product.png';
   }

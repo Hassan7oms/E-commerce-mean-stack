@@ -215,14 +215,14 @@ export class ProductsPage implements OnInit {
       return 'assets/default-product.png';
     }
 
-    // Handle string case
-    if (typeof this.product.images === 'string' && this.product.images.trim() !== '') {
-      return this.product.images;
-    }
-
-    // Handle array case
+    // Backend now always returns images as array with full URLs
     if (Array.isArray(this.product.images) && this.product.images.length > 0) {
       return this.product.images[0];
+    }
+
+    // Fallback for string case (though backend should return array)
+    if (typeof this.product.images === 'string' && this.product.images.trim() !== '') {
+      return this.product.images;
     }
 
     return 'assets/default-product.png';
