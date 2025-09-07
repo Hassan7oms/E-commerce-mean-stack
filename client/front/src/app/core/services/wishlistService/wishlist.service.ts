@@ -11,12 +11,15 @@ export class WishlistService {
   private url = environment.apiURL + '/wishlist'
 
   getWishlist() {
-    return this._http.get<WishlistInterface[]>(this.url + '/getWishlist');
+    return this._http.get<WishlistInterface[]>(this.url + '/getwishlist');
+  }
+
+  addToWishlist(productId: string) {
+    return this._http.post(this.url + '/addtowishlist', { productId });
   }
 
   removeFromWishlist(productId: string) {
-    // Assuming backend expects DELETE to /wishlist/remove/:productId
-    return this._http.delete(this.url + '/remove/' + productId);
+    return this._http.delete(this.url + '/removewishlist/' + productId);
   }
 
   clearWishlist() {

@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ProductInterface, IProductVariant } from '../../../../shared/models/product.interface';
 import { ProductService } from '../../../../core/services/productService/product.service';
 import { CartService } from '../../../../core/services/cartService/cart.service';
+import { WishlistService } from '../../../../core/services/wishlistService/wishlist.service';
 import { AuthService } from '../../../../core/services/authService/auth.service';
 
 @Component({
@@ -17,6 +18,7 @@ export class ProductsPage implements OnInit {
   isLoading = true;
   error: string | null = null;
   addingToCart = false;
+  addingToWishlist = false;
 
   // State for variant selection
   uniqueColors: string[] = [];
@@ -31,6 +33,7 @@ export class ProductsPage implements OnInit {
     private route: ActivatedRoute,
     private productService: ProductService,
     private cartService: CartService,
+    private wishlistService: WishlistService,
     private authService: AuthService,
     private router: Router
   ) {}
@@ -167,6 +170,46 @@ export class ProductsPage implements OnInit {
     });
   }
 
+  addToWishlist(): void {
+    // Check if user is logged in
+    if (!this.authService.isAuthenticated()) {
+      if (confirm('You need to log in to add items to wishlist. Would you like to go to the login page?')) {
+        this.router.navigate(['/login']);
+      }
+      return;
+    }
+
+    if (!this.product) {
+      alert("Product not found.");
+      return;
+    }
+
+    this.addingToWishlist = true;
+    
+    console.log(`Adding to wishlist: ${this.product.title}`);
+    
+    this.wishlistService.addToWishlist(this.product._id).subscribe({
+      next: (response) => {
+        this.addingToWishlist = false;
+        alert('Product added to wishlist successfully!');
+        console.log('Added to wishlist:', response);
+      },
+      error: (error) => {
+        this.addingToWishlist = false;
+        console.error('Error adding to wishlist:', error);
+        
+        if (error.status === 401) {
+          alert('Your session has expired. Please log in again.');
+          this.router.navigate(['/login']);
+        } else if (error.status === 400) {
+          alert(error.error?.message || 'Product is already in your wishlist.');
+        } else {
+          alert('Failed to add product to wishlist. Please try again.');
+        }
+      }
+    });
+  }
+
   getProductImage(): string {
     if (!this.product?.images) {
       return 'assets/default-product.png';
@@ -183,5 +226,12 @@ export class ProductsPage implements OnInit {
     }
 
     return 'assets/default-product.png';
+  }
+
+  getCategoryName(category: any): string {
+    if (typeof category === 'string') {
+      return category;
+    }
+    return category?.name || 'Category';
   }
 }

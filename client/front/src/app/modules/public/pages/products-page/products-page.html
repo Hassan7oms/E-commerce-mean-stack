@@ -16,15 +16,22 @@
       <!-- Right Column: Product Info & Actions -->
       <div class="product-info-section">
         <div class="breadcrumbs">
-      <!-- Home / {{ (p.categoryID[0] && (p.categoryID[0] as any).name) ? (p.categoryID[0] as any).name : p.categoryID[0] || 'Category' }}    -->
+          <span>Home</span> 
+          <span *ngIf="p.categoryID && p.categoryID[0]"> / {{ getCategoryName(p.categoryID[0]) }}</span>
+          <span> / {{ p.title }}</span>
         </div>
+        
         <h1 class="product-title">{{ p.title }}</h1>
+        
         <div class="product-price">
-          <!-- Price updates based on selected variant -->
-          <h2>{{ selectedVariant?.price || 'Select options to see price' }} EGP</h2>
+          <h2 *ngIf="selectedVariant; else noVariantPrice">{{ selectedVariant.price }} EGP</h2>
+          <ng-template #noVariantPrice>
+            <h2 class="price-placeholder">Select options to see price</h2>
+          </ng-template>
         </div>
+        
         <div class="product-short-description">
-          <p>{{ p.description.substring(0, 150) }}...</p>
+          <p>{{ p.description.length > 150 ? (p.description.substring(0, 150) + '...') : p.description }}</p>
         </div>
   
         <!-- Variant Selector: Color -->
@@ -54,19 +61,28 @@
           </div>
         </div>
         
-        <!-- Actions: Quantity and Add to Cart -->
+        <!-- Actions: Quantity, Add to Cart, and Add to Wishlist -->
         <div class="actions-group">
           <div class="quantity-selector">
-            <button (click)="decrementQuantity()">-</button>
+            <button (click)="decrementQuantity()" class="quantity-btn">-</button>
             <input type="number" [value]="quantity" min="1" readonly>
-            <button (click)="incrementQuantity()">+</button>
+            <button (click)="incrementQuantity()" class="quantity-btn">+</button>
           </div>
           <button class="add-to-cart-btn" 
                   (click)="addToCart()" 
                   [disabled]="!selectedVariant || selectedVariant.QTyavailable <= 0 || addingToCart">
               <span *ngIf="!addingToCart && (!selectedVariant || selectedVariant.QTyavailable > 0)">Add to Cart</span>
               <span *ngIf="!addingToCart && selectedVariant && selectedVariant.QTyavailable <= 0">Out of Stock</span>
-              <span *ngIf="addingToCart">Adding to Cart...</span>
+              <span *ngIf="addingToCart">Adding...</span>
+          </button>
+          <button class="add-to-wishlist-btn" 
+                  (click)="addToWishlist()" 
+                  [disabled]="addingToWishlist"
+                  title="Add to Wishlist">
+              <svg *ngIf="!addingToWishlist" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+              <span *ngIf="addingToWishlist" class="wishlist-spinner">♡</span>
           </button>
         </div>
   
