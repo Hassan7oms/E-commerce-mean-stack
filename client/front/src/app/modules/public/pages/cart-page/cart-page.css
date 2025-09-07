@@ -1,0 +1,115 @@
+/* src/app/pages/cart/cart.component.css */
+.page-container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+.page-header { text-align: center; margin-bottom: 3rem; }
+.page-header h1 { font-size: 2.25rem; margin-bottom: 0.5rem; }
+.page-header p { color: #718096; font-size: 1.1rem; }
+
+.cart-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
+.cart-items-list { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.cart-item {
+    display: grid;
+    grid-template-columns: 100px 1fr auto auto;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+}
+.item-image { width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem; }
+.item-title { font-weight: 600; text-decoration: none; color: #2d3748; }
+.item-title:hover { color: #f26722; }
+.item-price { color: #718096; }
+.remove-btn { background: none; border: none; color: #e53e3e; cursor: pointer; padding: 0; }
+.item-quantity { display: flex; border: 1px solid #e2e8f0; border-radius: 0.5rem; }
+.item-quantity button { background: #f7fafc; border: none; padding: 0.5rem 1rem; cursor: pointer; }
+.item-quantity input { width: 40px; text-align: center; border: none; font-size: 1rem; }
+.item-subtotal { font-weight: 700; font-size: 1.1rem; }
+
+.order-summary {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    align-self: start; /* Sticks to top */
+}
+.order-summary h3 { font-size: 1.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem; }
+.summary-row, .summary-total { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+.summary-total { font-weight: 700; font-size: 1.25rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0; }
+.checkout-btn {
+    display: block; width: 100%; text-align: center; padding: 0.875rem; background-color: #f26722; color: white;
+    border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none;
+}
+.state-container { text-align: center; padding: 4rem; background: #fff; border-radius: 0.75rem; }
+.empty-cart h2 { font-size: 1.5rem; }
+.explore-btn { display: inline-block; margin-top: 1.5rem; background-color: #f26722; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; }
+
+@media (max-width: 992px) { .cart-layout { grid-template-columns: 1fr; } }
+@media (max-width: 576px) { .cart-item { grid-template-columns: 1fr; text-align: center; } .item-image { margin: 0 auto; } }
+
+.cart-item.price-changed {
+    border-color: #f59e0b; /* Highlight the item with an orange border */
+    background-color: #fffbeb;
+}
+
+.price-mismatch-notice {
+    grid-column: 1 / -1; /* Make the notice span all columns */
+    padding: 1rem;
+    text-align: center;
+}
+
+.notice-text {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.notice-text span {
+    text-decoration: line-through;
+    color: #718096;
+}
+
+.notice-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.confirm-btn, .remove-btn-notice {
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.confirm-btn {
+    background-color: #16a34a; /* Green */
+    color: white;
+}
+
+.remove-btn-notice {
+    background-color: #ef4444; /* Red */
+    color: white;
+}
+
+.item-content.hidden {
+    display: none; /* Hide the normal content when the notice is shown */
+}
+
+/* Add grid to the item-content to maintain layout */
+.item-content {
+    display: contents; /* This makes the children behave as direct grid items of .cart-item */
+}
+
+.checkout-disabled-msg {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #f59e0b;
+    margin-top: 1rem;
+}
+
+.checkout-btn:disabled {
+    background-color: #9ca3af; /* Gray out the button when disabled */
+    cursor: not-allowed;
+}

@@ -1,0 +1,203 @@
+<div class="customers-management">
+  <!-- Header Section -->
+  <div class="customers-header">
+    <div class="header-content">
+      <h1>Customers Management</h1>
+      <p>Manage customer accounts and user permissions</p>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ customerStats.total }}</div>
+        <div class="stat-label">Total Users</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ customerStats.active }}</div>
+        <div class="stat-label">Active Users</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">❌</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ customerStats.inactive }}</div>
+        <div class="stat-label">Inactive Users</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🛒</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ customerStats.customers }}</div>
+        <div class="stat-label">Customers</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🔧</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ customerStats.admins }}</div>
+        <div class="stat-label">Admins</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="role-filter">Role:</label>
+        <select id="role-filter" [(ngModel)]="selectedRole" (change)="onFiltersChange()">
+          <option *ngFor="let role of roleOptions" [value]="role.value">
+            {{ role.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="status-filter">Status:</label>
+        <select id="status-filter" [(ngModel)]="selectedStatus" (change)="onFiltersChange()">
+          <option *ngFor="let status of statusOptions" [value]="status.value">
+            {{ status.label }}
+          </option>
+        </select>
+      </div>
+      
+      <div class="search-group">
+        <div class="search-box">
+          <input 
+            type="text" 
+            placeholder="Search customers by name, email..."
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="onSearch()"
+          >
+          <button class="search-btn" (click)="onSearch()">🔍</button>
+          <button class="clear-btn" (click)="clearSearch()" *ngIf="searchQuery">✖</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading customers...</p>
+  </div>
+
+  <!-- Customers Table -->
+  <div *ngIf="!loading" class="customers-table-container">
+    <table class="customers-table">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Join Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let customer of customers" class="customer-row">
+          <td class="customer-info">
+            <div class="customer-details">
+              <h4 class="customer-name">{{ customer.firstName }} {{ customer.lastName }}</h4>
+              <span class="customer-id">ID: {{ customer._id }}</span>
+            </div>
+          </td>
+          <td class="customer-email">{{ customer.email }}</td>
+          <td class="customer-role">
+            <span 
+              class="role-badge"
+              [class.admin]="customer.role === 'admin'"
+              [class.customer]="customer.role === 'customer'"
+            >
+              {{ customer.role | titlecase }}
+            </span>
+          </td>
+          <td class="customer-status">
+            <span 
+              class="status-badge"
+              [class.active]="customer.isActive"
+              [class.inactive]="!customer.isActive"
+            >
+              {{ customer.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td class="customer-date">{{ formatDate(customer.createdAt) }}</td>
+          <td class="customer-actions">
+            <div class="actions-group">
+              <button 
+                class="action-btn toggle"
+                (click)="toggleCustomerStatus(customer._id)"
+                [title]="customer.isActive ? 'Deactivate User' : 'Activate User'"
+              >
+                {{ customer.isActive ? '🚫' : '✅' }}
+              </button>
+              
+              <button 
+                class="action-btn delete"
+                (click)="deleteCustomer(customer._id)"
+                title="Delete User"
+                *ngIf="customer.role !== 'admin'"
+              >
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- No Customers Message -->
+    <div *ngIf="customers.length === 0" class="no-customers">
+      <div class="no-customers-icon">👥</div>
+      <h3>No customers found</h3>
+      <p>No customers match your current filters.</p>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && customers.length > 0" class="pagination">
+    <div class="pagination-info">
+      Showing {{ ((currentPage - 1) * itemsPerPage) + 1 }} to 
+      {{ getMinValue(currentPage * itemsPerPage, totalItems) }} of {{ totalItems }} customers
+    </div>
+    
+    <div class="pagination-controls">
+      <button 
+        (click)="onPageChange(currentPage - 1)" 
+        [disabled]="currentPage === 1"
+        class="page-btn"
+      >
+        ← Previous
+      </button>
+      
+      <button 
+        *ngFor="let page of getPageNumbers()" 
+        (click)="onPageChange(page)"
+        [class.active]="page === currentPage"
+        class="page-btn"
+      >
+        {{ page }}
+      </button>
+      
+      <button 
+        (click)="onPageChange(currentPage + 1)" 
+        [disabled]="currentPage === totalPages"
+        class="page-btn"
+      >
+        Next →
+      </button>
+    </div>
+  </div>
+</div>

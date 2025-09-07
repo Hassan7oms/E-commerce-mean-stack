@@ -1,0 +1,74 @@
+<!-- src/app/pages/cart/cart-page.html -->
+
+<div class="page-container">
+    <header class="page-header">
+      <h1>My Shopping Cart</h1>
+      <p>Review your items and proceed to checkout.</p>
+    </header>
+  
+    <div *ngIf="isLoading" class="state-container"><p>Loading your cart...</p></div>
+    <div *ngIf="error" class="state-container error"><p>{{ error }}</p></div>
+    <div *ngIf="!isLoading && !error && (!cart || cart.items.length === 0)" class="state-container empty-cart">
+      <h2>Your Cart is Empty</h2>
+      <a routerLink="/products" class="explore-btn">Start Shopping</a>
+    </div>
+  
+    <div *ngIf="!isLoading && !error && cart && cart.items.length > 0" class="cart-layout">
+      
+      <div class="cart-items-list">
+        <div class="cart-item" *ngFor="let item of cart.items" [class.price-changed]="hasPriceMismatch(item._id!)">
+          
+          <!-- Price Mismatch Notification -->
+          <div *ngIf="hasPriceMismatch(item._id!)" class="price-mismatch-notice">
+            <div class="notice-text">
+              <strong>Price Changed!</strong> The price for this item has updated from 
+              <span>{{ getMismatchInfo(item._id!)?.oldPrice }} EGP</span> to 
+              <strong>{{ getMismatchInfo(item._id!)?.newPrice }} EGP</strong>.
+            </div>
+            <div class="notice-actions">
+              <button class="confirm-btn" (click)="confirmPriceChange(item._id!)">Keep It</button>
+              <button class="remove-btn-notice" (click)="removeItem(item._id!)">Remove</button>
+            </div>
+          </div>
+
+          <!-- Default Item Display -->
+          <div class="item-content" [class.hidden]="hasPriceMismatch(item._id!)">
+            <img [src]="getProductImageUrl(item)" [alt]="item.title" class="item-image">
+            <div class="item-details">
+              <a [routerLink]="['/product', getProductSlug(item)]" class="item-title">{{ item.title }}</a>
+              <p class="item-price">{{ item.price }} EGP</p>
+              <button class="remove-btn" (click)="removeItem(item._id!)">Remove</button>
+            </div>
+            <div class="item-quantity">
+              <button (click)="updateQuantity(item, item.quantity - 1)">-</button>
+              <input type="number" [value]="item.quantity" readonly>
+              <button (click)="updateQuantity(item, item.quantity + 1)">+</button>
+            </div>
+            <div class="item-subtotal">
+              {{ calculateSubtotal(item) }} EGP
+            </div>
+          </div>
+
+        </div>
+      </div>
+  
+      <div class="order-summary">
+        <h3>Order Summary</h3>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>{{ cart.totalPrice }} EGP</span>
+        </div>
+        <div class="summary-row"><span>Shipping</span><span>FREE</span></div>
+        <div class="summary-total">
+          <span>Total</span>
+          <span>{{ cart.totalPrice }} EGP</span>
+        </div>
+        <!-- CORRECTED: Use (click) event and [disabled] property -->
+        <button (click)="onCheckout()" [disabled]="isCheckoutDisabled" class="checkout-btn">
+            Proceed to Checkout
+        </button>
+        <p *ngIf="isCheckoutDisabled" class="checkout-disabled-msg">Please resolve price changes before proceeding.</p>
+      </div>
+  
+    </div>
+</div>

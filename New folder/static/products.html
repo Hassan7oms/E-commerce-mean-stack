@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Products - NileStyle</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta name="description" content="Browse our complete collection of modern Egyptian fashion. Filter by category, price, and sort by name or price.">
+    <style>
+        /* Additional styles for products page */
+        .products-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+            .products-container {
+                flex-direction: row;
+            }
+        }
+
+        .filters-sidebar {
+            width: 100%;
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        @media (min-width: 1024px) {
+            .filters-sidebar {
+                width: 16rem;
+                flex-shrink: 0;
+            }
+        }
+
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--foreground);
+        }
+
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary);
+            opacity: 0.2;
+        }
+
+        .search-input {
+            position: relative;
+        }
+
+        .search-input input {
+            padding-left: 2.5rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted-foreground);
+            pointer-events: none;
+        }
+
+        .price-range {
+            margin-bottom: 0.5rem;
+        }
+
+        .price-inputs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .price-inputs input {
+            flex: 1;
+        }
+
+        .products-main {
+            flex: 1;
+        }
+
+        .products-toolbar {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .products-toolbar {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .view-toggle button {
+            padding: 0.5rem;
+            border: none;
+            background: white;
+            color: var(--muted-foreground);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .view-toggle button.active {
+            background: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .products-list .product-card {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .products-list .product-image {
+            width: 12rem;
+            flex-shrink: 0;
+            aspect-ratio: 1;
+        }
+
+        .products-list .product-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-description {
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+            margin-bottom: 0.5rem;
+        }
+
+        .add-to-cart-btn {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-to-cart-btn:hover {
+            opacity: 0.9;
+        }
+
+        .no-products {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--muted-foreground);
+        }
+
+        .filter-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--foreground);
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <!-- Logo -->
+            <a href="index.html" class="logo">NileStyle</a>
+
+            <!-- Desktop Navigation -->
+            <nav class="nav">
+                <a href="men.html">Men</a>
+                <a href="women.html">Women</a>
+                <a href="products.html" style="color: var(--primary);">All Products</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+
+            <!-- Header Icons -->
+            <div class="header-icons">
+                <button class="icon-btn" aria-label="Search">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+
+                <button class="icon-btn" aria-label="Wishlist">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"></path>
+                    </svg>
+                </button>
+
+                <button class="icon-btn" aria-label="User Account">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </button>
+
+                <button class="icon-btn cart-badge" aria-label="Shopping Cart">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                        <path d="M3 6h18"></path>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                </button>
+
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="4" x2="20" y1="6" y2="6"></line>
+                        <line x1="4" x2="20" y1="12" y2="12"></line>
+                        <line x1="4" x2="20" y1="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobileMenu" class="mobile-menu">
+            <a href="men.html">Men</a>
+            <a href="women.html">Women</a>
+            <a href="products.html">All Products</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="section">
+            <div class="container">
+                <!-- Page Header -->
+                <div style="margin-bottom: 2rem;">
+                    <h1 style="font-size: 2rem; font-weight: bold; margin-bottom: 1rem;">All Products</h1>
+                    <p style="color: var(--muted-foreground);">
+                        Discover our complete collection of modern Egyptian fashion
+                    </p>
+                </div>
+
+                <div class="products-container">
+                    <!-- Filters Sidebar -->
+                    <aside class="filters-sidebar">
+                        <h3 class="filter-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                            </svg>
+                            Filters
+                        </h3>
+
+                        <!-- Search -->
+                        <div class="filter-group">
+                            <label for="search">Search</label>
+                            <div class="search-input">
+                                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                                <input type="text" id="search" placeholder="Search products..." oninput="filterProducts()">
+                            </div>
+                        </div>
+
+                        <!-- Category Filter -->
+                        <div class="filter-group">
+                            <label for="category">Category</label>
+                            <select id="category" onchange="filterProducts()">
+                                <option value="all">All Categories</option>
+                                <option value="men">Men</option>
+                                <option value="women">Women</option>
+                            </select>
+                        </div>
+
+                        <!-- Subcategory Filter -->
+                        <div class="filter-group">
+                            <label for="subcategory">Subcategory</label>
+                            <select id="subcategory" onchange="filterProducts()">
+                                <option value="all">All Subcategories</option>
+                                <option value="t-shirts">T-Shirts</option>
+                                <option value="shirts">Shirts</option>
+                                <option value="pants">Pants</option>
+                            </select>
+                        </div>
+
+                        <!-- Price Range -->
+                        <div class="filter-group">
+                            <label>Price Range: <span id="priceRangeDisplay">0 - 2000 EGP</span></label>
+                            <div class="price-inputs">
+                                <input type="number" id="minPrice" placeholder="Min" min="0" max="2000" value="0" onchange="filterProducts()">
+                                <input type="number" id="maxPrice" placeholder="Max" min="0" max="2000" value="2000" onchange="filterProducts()">
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- Products Main -->
+                    <div class="products-main">
+                        <!-- Toolbar -->
+                        <div class="products-toolbar">
+                            <div class="toolbar-left">
+                                <span id="productsCount" style="font-size: 0.875rem; color: var(--muted-foreground);">
+                                    6 products found
+                                </span>
+                            </div>
+                            
+                            <div class="toolbar-right">
+                                <!-- Sort -->
+                                <select id="sortBy" onchange="sortProducts()" style="padding: 0.5rem; border: 1px solid var(--border); border-radius: var(--radius);">
+                                    <option value="name">Sort by Name</option>
+                                    <option value="price-low">Price: Low to High</option>
+                                    <option value="price-high">Price: High to Low</option>
+                                    <option value="rating">Highest Rated</option>
+                                </select>
+
+                                <!-- View Mode -->
+                                <div class="view-toggle">
+                                    <button id="gridViewBtn" class="active" onclick="setViewMode('grid')">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect width="7" height="7" x="3" y="3" rx="1"></rect>
+                                            <rect width="7" height="7" x="14" y="3" rx="1"></rect>
+                                            <rect width="7" height="7" x="14" y="14" rx="1"></rect>
+                                            <rect width="7" height="7" x="3" y="14" rx="1"></rect>
+                                        </svg>
+                                    </button>
+                                    <button id="listViewBtn" onclick="setViewMode('list')">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="8" x2="21" y1="6" y2="6"></line>
+                                            <line x1="8" x2="21" y1="12" y2="12"></line>
+                                            <line x1="8" x2="21" y1="18" y2="18"></line>
+                                            <line x1="3" x2="3.01" y1="6" y2="6"></line>
+                                            <line x1="3" x2="3.01" y1="12" y2="12"></line>
+                                            <line x1="3" x2="3.01" y1="18" y2="18"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Products Grid -->
+                        <div id="productsGrid" class="products-grid">
+                            <!-- Products will be populated by JavaScript -->
+                        </div>
+
+                        <!-- No Products Message -->
+                        <div id="noProducts" class="no-products" style="display: none;">
+                            <p>No products found with the current filters.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <!-- Company Info -->
+                <div class="footer-section">
+                    <h3>NileStyle</h3>
+                    <p>
+                        Modern Egyptian fashion for the contemporary wardrobe. Quality clothing
+                        designed for the style-conscious individual.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">f</a>
+                        <a href="#" class="social-link">ig</a>
+                        <a href="#" class="social-link">tw</a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="men.html">Men's Collection</a>
+                    <a href="women.html">Women's Collection</a>
+                    <a href="faq.html">FAQ</a>
+                    <a href="contact.html">Contact Us</a>
+                </div>
+
+                <!-- Customer Service -->
+                <div class="footer-section">
+                    <h4>Customer Service</h4>
+                    <a href="#">Shipping Info</a>
+                    <a href="#">Returns & Exchanges</a>
+                    <a href="#">Size Guide</a>
+                    <a href="#">Track Your Order</a>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="footer-section">
+                    <h4>Get in Touch</h4>
+                    <p>📧 hello@nilestyle.com</p>
+                    <p>📞 +20 123 456 789</p>
+                    <p>📍 Cairo, Egypt</p>
+                    <div class="footer-promo">
+                        <p>✨ Free shipping on orders over 500 EGP</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div class="footer-bottom">
+                <p>© 2024 NileStyle. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="products.js"></script>
+</body>
+</html>

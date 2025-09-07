@@ -1,0 +1,78 @@
+<!-- Main Sidebar Container -->
+<aside class="sidebar" id="sidebar" [class.open]="isSidebarOpen">
+  <!-- Sidebar Header -->
+  <div class="sidebar-header">
+    <a routerLink="/admin" class="sidebar-logo">
+      <div class="sidebar-logo-icon">NS</div>
+      <span>NileStyle Admin</span>
+    </a>
+  </div>
+
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar-nav">
+    <!-- Main Section -->
+    <div class="nav-section">
+      <div class="nav-section-title">Main</div>
+      <a
+        routerLink="/admin/dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-link"
+      >
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="9"></rect>
+            <rect x="14" y="3" width="7" height="5"></rect>
+            <rect x="14" y="12" width="7" height="9"></rect>
+            <rect x="3" y="16" width="7" height="5"></rect>
+        </svg>
+        Dashboard
+      </a>
+      <a routerLink="/admin/customers" routerLinkActive="active" class="nav-link">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        Customers
+        <span class="nav-badge">23</span>
+      </a>
+      <a routerLink="/admin/orders" routerLinkActive="active" class="nav-link">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+            <path d="M3 6h18"></path>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        Orders
+        <span class="nav-badge">12</span>
+      </a>
+    </div>
+
+    <!-- Catalog Section -->
+    <div class="nav-section">
+      <div class="nav-section-title">Catalog</div>
+      <a routerLink="/admin/products" routerLinkActive="active" class="nav-link">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+        </svg>
+        Products
+      </a>
+      <a routerLink="/admin/categories" routerLinkActive="active" class="nav-link">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          Categories
+      </a>
+      <a routerLink="/admin/testimonials" routerLinkActive="active" class="nav-link">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+        </svg>
+        Testimonials
+        <span class="nav-badge">5</span>
+      </a>
+    </div>
+
+    <!-- Additional sections like Sales and Settings would go here -->
+  </nav>
+</aside>

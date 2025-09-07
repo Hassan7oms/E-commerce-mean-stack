@@ -1,0 +1,239 @@
+<!-- Main Content -->
+<main>
+    <!-- Error State -->
+    <div *ngIf="hasError" class="error-container">
+        <div class="container">
+            <div class="error-message">
+                <h3>Oops! Something went wrong</h3>
+                <p>{{ errorMessage }}</p>
+                <button (click)="retryLoadData()" class="btn btn-primary">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div>
+                    <h1>
+                        Modern Egyptian
+                        <span class="highlight">Fashion</span>
+                    </h1>
+                    <p>
+                        Discover contemporary clothing that blends traditional Egyptian craftsmanship 
+                        with modern style. Perfect for the young professional.
+                    </p>
+                    <div class="hero-buttons">
+                        <a routerLink="/products" class="btn btn-primary">Shop Collection</a>
+                        <a routerLink="/products" class="btn btn-outline">View Lookbook</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://via.placeholder.com/400x400/f4f4f4/cccccc?text=Featured+Fashion" alt="Featured Fashion">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Banners -->
+    <section class="trust-banners">
+        <div class="container">
+            <div class="trust-grid">
+                <div class="trust-item">
+                    <div class="trust-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 18V6a2 2 0 0 0-2-2c-1.1 0-2 .9-2 2v12"></path>
+                            <path d="M15 18H9"></path>
+                            <path d="M19 18h2l-3.5-7L19 4h-2L15 11l-1-7H8v14h7"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>Nationwide Shipping</h3>
+                        <p>Free delivery over 500 EGP</p>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                            <path d="M21 3v5h-5"></path>
+                            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                            <path d="M8 16H3v5"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>14 Days Return</h3>
+                        <p>Easy replacement or refund</p>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>Secure Payment</h3>
+                        <p>100% secure checkout</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="section bg-sand">
+        <div class="container">
+            <div class="section-header">
+                <h2>Shop by Category</h2>
+                <p>Explore our carefully curated collections for men and women</p>
+            </div>
+            
+            <!-- Loading State -->
+            <div *ngIf="isLoadingCategories" class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>Loading categories...</p>
+            </div>
+            
+            <!-- Categories Grid -->
+            <div *ngIf="!isLoadingCategories" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                <a *ngFor="let category of categories" 
+                   [routerLink]="['/products']" 
+                   [queryParams]="{category: category.slug}" 
+                   class="category-card">
+                    <div class="category-image">
+                        <img [src]="getCategoryImageUrl(category)" 
+                             [alt]="category.name"
+                             loading="lazy">
+                    </div>
+                    <div class="category-info">
+                        <h3 class="category-name">{{ category.name }}</h3>
+                        <p class="category-count">{{ getCategoryProductCount(category) }} items</p>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- No Categories State -->
+            <div *ngIf="!isLoadingCategories && categories.length === 0" class="no-data">
+                <p>No categories available at the moment.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="section">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+                <div>
+                    <h2 style="font-size: 2rem; font-weight: bold; margin-bottom: 1rem;">Featured Products</h2>
+                    <p style="color: var(--muted-foreground);">Handpicked favorites from our latest collection</p>
+                </div>
+                <a routerLink="/products" style="display: flex; align-items: center; gap: 0.5rem; color: var(--primary); text-decoration: none;">
+                    <span style="font-weight: 500;">View All</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14"></path>
+                        <path d="m12 5 7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+            
+            <!-- Loading State -->
+            <div *ngIf="isLoadingProducts" class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>Loading featured products...</p>
+            </div>
+            
+            <!-- Products Grid -->
+            <div *ngIf="!isLoadingProducts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div *ngFor="let product of featuredProducts" class="product-card">
+                    <div class="product-image">
+                        <img [src]="getProductImageUrl(product)" 
+                             [alt]="product.title"
+                             loading="lazy">
+                        <div *ngIf="!isProductAvailable(product)" 
+                             style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;">
+                            <span style="background: white; color: var(--foreground); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;">
+                                Out of Stock
+                            </span>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <p class="product-category">{{ product.categoryID }}</p>
+                        <h3 class="product-name">{{ product.title }}</h3>
+                        <div class="product-rating">
+                            <!-- You can add rating display here -->
+                        </div>
+                        <div class="product-price">
+                            <span class="price-current">{{ getProductPriceRange(product).min }} EGP</span>
+                            <span *ngIf="getProductPriceRange(product).min !== getProductPriceRange(product).max" 
+                                  class="price-original">{{ getProductPriceRange(product).max }} EGP</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- No Products State -->
+            <div *ngIf="!isLoadingProducts && featuredProducts.length === 0" class="no-data">
+                <p>No featured products available at the moment.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="section bg-sand">
+        <div class="container">
+            <div class="section-header">
+                <h2>What Our Customers Say</h2>
+                <p>Real reviews from real customers across Egypt</p>
+            </div>
+            
+            <!-- Loading State -->
+            <div *ngIf="isLoadingTestimonials" class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>Loading testimonials...</p>
+            </div>
+            
+            <!-- Testimonials Grid -->
+            <div *ngIf="!isLoadingTestimonials" class="grid grid-cols-1 md:grid-cols-3">
+                <div *ngFor="let testimonial of testimonials" class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <div *ngFor="let star of [1,2,3,4,5]" 
+                             [class]="star <= testimonial.rating ? 'star' : 'star empty'">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"{{ testimonial.comment || 'Great product!' }}"</p>
+                    <div class="testimonial-author">
+                        <div>
+                            <p class="author-name">{{ getUserName(testimonial.userID) || 'Customer' }}</p>
+                            <p class="author-location">Egypt</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- No Testimonials State -->
+            <div *ngIf="!isLoadingTestimonials && testimonials.length === 0" class="no-data">
+                <p>No testimonials available at the moment.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="newsletter">
+        <div class="container">
+            <h2>Stay Updated</h2>
+            <p>
+                Subscribe to our newsletter and be the first to know about new arrivals, 
+                exclusive offers, and style tips.
+            </p>
+            <form class="newsletter-form" (submit)="onNewsletterSubmit($event)">
+                <input type="email" placeholder="Enter your email" required>
+                <button type="submit">Subscribe</button>
+            </form>
+        </div>
+    </section>
+</main>

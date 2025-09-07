@@ -1,0 +1,29 @@
+<div class="products-listing-container">
+  <header class="page-header">
+    <h1>All Products</h1>
+    <p>Discover our complete collection of products.</p>
+  </header>
+
+  <!-- Handle loading state -->
+  <div *ngIf="isLoading" class="loading-state">
+    <p>Loading products...</p>
+  </div>
+
+  <!-- Handle error state -->
+  <div *ngIf="error" class="error-state">
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Handle empty state -->
+  <div *ngIf="!isLoading && !error && products.length === 0" class="empty-state">
+    <p>No products found.</p>
+  </div>
+
+  <!-- Product Grid -->
+  <div *ngIf="!isLoading && !error && products.length > 0" class="product-grid">
+    <app-product-card 
+      *ngFor="let product of products" 
+      [product]="product">
+    </app-product-card>
+  </div>
+</div>

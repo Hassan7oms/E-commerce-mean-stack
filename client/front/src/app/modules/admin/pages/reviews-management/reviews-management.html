@@ -1,0 +1,210 @@
+<p><div class="reviews-management">
+  <!-- Header Section -->
+  <div class="reviews-header">
+    <div class="header-content">
+      <h1>Reviews Management</h1>
+      <p>Manage and moderate customer product reviews</p>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ reviewStats.total }}</div>
+        <div class="stat-label">Total Reviews</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ reviewStats.pending }}</div>
+        <div class="stat-label">Pending Approval</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ reviewStats.approved }}</div>
+        <div class="stat-label">Approved</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ (reviewStats.averageRating || 0).toFixed(1) }}</div>
+        <div class="stat-label">Average Rating</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="status-filter">Filter by Status:</label>
+        <select id="status-filter" [(ngModel)]="selectedStatus" (change)="onStatusFilterChange()">
+          <option *ngFor="let status of statusOptions" [value]="status.value">
+            {{ status.label }}
+          </option>
+        </select>
+      </div>
+      
+      <div class="search-group">
+        <div class="search-box">
+          <input 
+            type="text" 
+            placeholder="Search reviews by product, customer..."
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="onSearch()"
+          >
+          <button class="search-btn" (click)="onSearch()">🔍</button>
+          <button class="clear-btn" (click)="clearSearch()" *ngIf="searchQuery">✖</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading reviews...</p>
+  </div>
+
+  <!-- Reviews Grid -->
+  <div *ngIf="!loading" class="reviews-grid">
+    <div *ngFor="let review of reviews" class="review-card">
+      <div class="review-header">
+        <div class="product-info">
+          <div class="product-image">
+            <img 
+              [src]="review.productID.images[0] || '/assets/placeholder-product.png'" 
+              [alt]="review.productID.title"
+              onerror="this.src='/assets/placeholder-product.png'"
+            >
+          </div>
+          <div class="product-details">
+            <h3 class="product-title">{{ review.productID.title || 'Product not found' }}</h3>
+            <p class="customer-name">by {{ review.userID.firstName }} {{ review.userID.lastName }}</p>
+          </div>
+        </div>
+        <div class="review-status">
+          <span 
+            class="status-badge" 
+            [class.pending]="!review.isApproved"
+            [class.approved]="review.isApproved"
+          >
+            {{ review.isApproved ? 'Approved' : 'Pending' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="review-rating">
+        <div class="stars">
+          <span 
+            *ngFor="let star of getStarArray(review.rating); let i = index"
+            class="star"
+            [class.filled]="star"
+          >
+            ⭐
+          </span>
+        </div>
+        <span class="rating-text">{{ review.rating }}/5</span>
+      </div>
+
+      <div class="review-content">
+        <p>{{ review.comment || 'No comment provided' }}</p>
+      </div>
+
+      <div class="review-meta">
+        <span class="review-date">{{ formatDate(review.createdAt) }}</span>
+        <div class="review-flags">
+          <span *ngIf="!review.isActive" class="flag inactive">Inactive</span>
+          <span *ngIf="review.isDeleted" class="flag deleted">Deleted</span>
+        </div>
+      </div>
+
+      <div class="review-actions">
+        <button 
+          *ngIf="!review.isApproved && !review.isDeleted"
+          class="action-btn approve"
+          (click)="approveReview(review._id)"
+        >
+          ✅ Approve
+        </button>
+        
+        <button 
+          *ngIf="!review.isApproved && !review.isDeleted"
+          class="action-btn reject"
+          (click)="rejectReview(review._id)"
+        >
+          ❌ Reject
+        </button>
+        
+        <button 
+          *ngIf="!review.isDeleted"
+          class="action-btn toggle"
+          (click)="toggleReviewStatus(review._id)"
+        >
+          {{ review.isActive ? '🚫 Deactivate' : '✅ Activate' }}
+        </button>
+        
+        <button 
+          *ngIf="!review.isDeleted"
+          class="action-btn delete"
+          (click)="deleteReview(review._id)"
+        >
+          🗑️ Delete
+        </button>
+      </div>
+    </div>
+
+    <!-- No Reviews Message -->
+    <div *ngIf="reviews.length === 0" class="no-reviews">
+      <div class="no-reviews-icon">⭐</div>
+      <h3>No reviews found</h3>
+      <p>No reviews match your current filters.</p>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && reviews.length > 0" class="pagination">
+    <div class="pagination-info">
+      Showing {{ ((currentPage - 1) * itemsPerPage) + 1 }} to 
+      {{ getMinValue(currentPage * itemsPerPage, totalItems) }} of {{ totalItems }} reviews
+    </div>
+    
+    <div class="pagination-controls">
+      <button 
+        (click)="onPageChange(currentPage - 1)" 
+        [disabled]="currentPage === 1"
+        class="page-btn"
+      >
+        ← Previous
+      </button>
+      
+      <button 
+        *ngFor="let page of getPageNumbers()" 
+        (click)="onPageChange(page)"
+        [class.active]="page === currentPage"
+        class="page-btn"
+      >
+        {{ page }}
+      </button>
+      
+      <button 
+        (click)="onPageChange(currentPage + 1)" 
+        [disabled]="currentPage === totalPages"
+        class="page-btn"
+      >
+        Next →
+      </button>
+    </div>
+  </div>
+</div>

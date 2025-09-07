@@ -1,0 +1,106 @@
+<!-- Product Form -->
+<div class="product-form-container">
+  <h2>{{ isEditMode ? 'Edit Product' : 'Add New Product' }}</h2>
+  
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label>Product Title *</label>
+      <input 
+        type="text" 
+        formControlName="title" 
+        (blur)="generateSlug()"
+        [class.error]="isFieldInvalid('title')"
+      >
+      <div class="error-message" *ngIf="isFieldInvalid('title')">
+        {{ getFieldError('title') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Product Slug *</label>
+      <input 
+        type="text" 
+        formControlName="slug"
+        [class.error]="isFieldInvalid('slug')"
+      >
+      <div class="error-message" *ngIf="isFieldInvalid('slug')">
+        {{ getFieldError('slug') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Description *</label>
+      <textarea 
+        formControlName="description"
+        rows="4"
+        [class.error]="isFieldInvalid('description')"
+      ></textarea>
+      <div class="error-message" *ngIf="isFieldInvalid('description')">
+        {{ getFieldError('description') }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Category *</label>
+      <select formControlName="categoryID" [class.error]="isFieldInvalid('categoryID')">
+        <option value="">Select Category</option>
+        <option *ngFor="let category of categories" [value]="category._id">
+          {{ category.name }}
+        </option>
+      </select>
+      <div class="error-message" *ngIf="isFieldInvalid('categoryID')">
+        Category is required
+      </div>
+    </div>
+
+    <!-- Variants Section -->
+    <div class="variants-section">
+      <h3>Product Variants</h3>
+      <div formArrayName="variant">
+        <div *ngFor="let variant of variants.controls; let i = index" [formGroupName]="i" class="variant-card">
+          <div class="variant-header">
+            <h4>Variant {{ i + 1 }}</h4>
+            <button type="button" *ngIf="variants.length > 1" (click)="removeVariant(i)" class="remove-btn">Remove</button>
+          </div>
+          
+          <div class="variant-fields">
+            <div class="form-group">
+              <label>Size *</label>
+              <input type="text" formControlName="size" [class.error]="isVariantFieldInvalid(i, 'size')">
+            </div>
+            
+            <div class="form-group">
+              <label>Color *</label>
+              <input type="text" formControlName="color" [class.error]="isVariantFieldInvalid(i, 'color')">
+            </div>
+            
+            <div class="form-group">
+              <label>Price (EGP) *</label>
+              <input type="number" formControlName="price" [class.error]="isVariantFieldInvalid(i, 'price')">
+            </div>
+            
+            <div class="form-group">
+              <label>Available Quantity *</label>
+              <input type="number" formControlName="QTyavailable" [class.error]="isVariantFieldInvalid(i, 'QTyavailable')">
+            </div>
+            
+            <div class="form-group">
+              <label>Reorder Point</label>
+              <input type="number" formControlName="reorderPoint">
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <button type="button" (click)="addVariant()" class="add-variant-btn">Add Variant</button>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" (click)="cancel()" class="btn btn-outline">Cancel</button>
+      <button type="submit" [disabled]="productForm.invalid || submitting" class="btn btn-primary">
+        {{ submitting ? 'Saving...' : (isEditMode ? 'Update Product' : 'Create Product') }}
+      </button>
+    </div>
+  </form>
+</div>

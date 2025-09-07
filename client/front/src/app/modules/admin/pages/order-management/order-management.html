@@ -1,0 +1,188 @@
+<div class="orders-management">
+  <!-- Header Section -->
+  <div class="orders-header">
+    <div class="header-content">
+      <h1>Order Management</h1>
+      <p>Manage and track all customer orders</p>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📦</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ orderStats.total }}</div>
+        <div class="stat-label">Total Orders</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ orderStats.pending }}</div>
+        <div class="stat-label">Pending</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⚙️</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ orderStats.processing }}</div>
+        <div class="stat-label">Processing</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🚚</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ orderStats.shipped }}</div>
+        <div class="stat-label">Shipped</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ orderStats.delivered }}</div>
+        <div class="stat-label">Delivered</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label for="status-filter">Filter by Status:</label>
+        <select id="status-filter" [(ngModel)]="selectedStatus" (change)="onStatusFilterChange()">
+          <option *ngFor="let status of statusOptions" [value]="status.value">
+            {{ status.label }}
+          </option>
+        </select>
+      </div>
+      
+      <div class="search-group">
+        <div class="search-box">
+          <input 
+            type="text" 
+            placeholder="Search orders by order number, customer..."
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="onSearch()"
+          >
+          <button class="search-btn" (click)="onSearch()">🔍</button>
+          <button class="clear-btn" (click)="clearSearch()" *ngIf="searchQuery">✖</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading orders...</p>
+  </div>
+
+  <!-- Orders Table -->
+  <div *ngIf="!loading" class="orders-table-container">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>Order #</th>
+          <th>Customer</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders" class="order-row">
+          <td class="order-number">{{ order.ordernumber }}</td>
+          <td class="customer-info">
+            <div class="customer-id">ID: {{ order.userID }}</div>
+          </td>
+          <td class="items-info">
+            <div class="items-count">{{ order.items.length }} items</div>
+            <div class="items-preview">
+              <div *ngFor="let item of order.items.slice(0, 2)" class="item-preview">
+                {{ item.title }} ({{ item.quantity }}x)
+              </div>
+              <div *ngIf="order.items.length > 2" class="more-items">
+                +{{ order.items.length - 2 }} more
+              </div>
+            </div>
+          </td>
+          <td class="order-total">
+            ${{ calculateOrderTotal(order).toFixed(2) }}
+          </td>
+          <td class="order-status">
+            <span [class]="'status-badge ' + getStatusClass(order.status)">
+              {{ order.status | titlecase }}
+            </span>
+          </td>
+          <td class="order-date">{{ formatDate(order.createdAt) }}</td>
+          <td class="order-actions">
+            <div class="actions-dropdown">
+              <select 
+                [value]="order.status" 
+                (change)="onStatusChange(order._id, $event)"
+                class="status-select"
+              >
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- No Orders Message -->
+    <div *ngIf="orders.length === 0" class="no-orders">
+      <div class="no-orders-icon">📦</div>
+      <h3>No orders found</h3>
+      <p>No orders match your current filters.</p>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && orders.length > 0" class="pagination">
+    <div class="pagination-info">
+      Showing {{ ((currentPage - 1) * itemsPerPage) + 1 }} to 
+      {{ getMinValue(currentPage * itemsPerPage, totalItems) }} of {{ totalItems }} orders
+    </div>
+    
+    <div class="pagination-controls">
+      <button 
+        (click)="onPageChange(currentPage - 1)" 
+        [disabled]="currentPage === 1"
+        class="page-btn"
+      >
+        ← Previous
+      </button>
+      
+      <button 
+        *ngFor="let page of getPageNumbers()" 
+        (click)="onPageChange(page)"
+        [class.active]="page === currentPage"
+        class="page-btn"
+      >
+        {{ page }}
+      </button>
+      
+      <button 
+        (click)="onPageChange(currentPage + 1)" 
+        [disabled]="currentPage === totalPages"
+        class="page-btn"
+      >
+        Next →
+      </button>
+    </div>
+  </div>
+</div>

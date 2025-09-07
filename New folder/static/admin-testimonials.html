@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testimonials Management - NileStyle Admin</title>
+    <link rel="stylesheet" href="admin.css">
+    <style>
+        /* Additional styles for testimonials page */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .testimonials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .testimonial-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .testimonial-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .customer-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .customer-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-foreground);
+            font-weight: 600;
+        }
+
+        .customer-details h4 {
+            font-weight: 600;
+            color: var(--foreground);
+            margin: 0;
+        }
+
+        .customer-details p {
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+            margin: 0;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .status-badge.pending {
+            background: var(--warning);
+            color: var(--warning-foreground);
+        }
+
+        .status-badge.approved {
+            background: var(--success);
+            color: var(--success-foreground);
+        }
+
+        .status-badge.rejected {
+            background: var(--destructive);
+            color: var(--destructive-foreground);
+        }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--muted);
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+        }
+
+        .product-image {
+            width: 3rem;
+            height: 3rem;
+            border-radius: var(--radius);
+            object-fit: cover;
+            background: var(--muted);
+        }
+
+        .product-details h5 {
+            font-weight: 500;
+            color: var(--foreground);
+            margin: 0;
+        }
+
+        .product-details p {
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+            margin: 0;
+        }
+
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stars {
+            display: flex;
+            gap: 0.125rem;
+        }
+
+        .star {
+            width: 1rem;
+            height: 1rem;
+            color: var(--gold);
+            fill: var(--gold);
+        }
+
+        .star.empty {
+            color: #d1d5db;
+            fill: #d1d5db;
+        }
+
+        .rating-text {
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+        }
+
+        .review-title {
+            font-weight: 600;
+            color: var(--foreground);
+            margin-bottom: 0.75rem;
+        }
+
+        .review-comment {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .review-images {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-image {
+            width: 4rem;
+            height: 4rem;
+            border-radius: var(--radius);
+            object-fit: cover;
+            background: var(--muted);
+        }
+
+        .testimonial-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+        }
+
+        .footer-info div {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .testimonial-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--muted-foreground);
+        }
+
+        .action-btn:hover {
+            color: var(--foreground);
+            background: var(--muted);
+        }
+
+        .action-btn.approve {
+            color: var(--success);
+        }
+
+        .action-btn.approve:hover {
+            background: var(--success);
+            opacity: 0.1;
+        }
+
+        .action-btn.reject {
+            color: var(--destructive);
+        }
+
+        .action-btn.reject:hover {
+            background: var(--destructive);
+            opacity: 0.1;
+        }
+
+        .action-btn.view {
+            color: var(--muted-foreground);
+        }
+
+        /* Modal styles */
+        .testimonial-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .testimonial-modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            max-width: 42rem;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .customer-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--muted);
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+        }
+
+        .customer-section .customer-avatar {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .product-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+        }
+
+        .product-section .product-image {
+            width: 4rem;
+            height: 4rem;
+        }
+
+        .full-comment {
+            color: var(--foreground);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-images {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 8rem;
+            border-radius: var(--radius);
+            object-fit: cover;
+            background: var(--muted);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .modal-btn.approve {
+            background: var(--success);
+            color: var(--success-foreground);
+        }
+
+        .modal-btn.approve:hover {
+            opacity: 0.9;
+        }
+
+        .modal-btn.reject {
+            background: var(--destructive);
+            color: var(--destructive-foreground);
+        }
+
+        .modal-btn.reject:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <a href="admin.html" class="sidebar-logo">
+                    <div class="sidebar-logo-icon">NS</div>
+                    <span>NileStyle Admin</span>
+                </a>
+            </div>
+
+            <!-- Sidebar Navigation -->
+            <nav class="sidebar-nav">
+                <!-- Main Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="admin.html" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="9"></rect>
+                            <rect x="14" y="3" width="7" height="5"></rect>
+                            <rect x="14" y="12" width="7" height="9"></rect>
+                            <rect x="3" y="16" width="7" height="5"></rect>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="admin-orders.html" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                            <path d="M3 6h18"></path>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                        Orders
+                        <span class="nav-badge">12</span>
+                    </a>
+                    <a href="#" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Customers
+                        <span class="nav-badge">23</span>
+                    </a>
+                </div>
+
+                <!-- Catalog Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Catalog</div>
+                    <a href="#" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                        Products
+                    </a>
+                    <a href="admin-testimonials.html" class="nav-link active">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                        Testimonials
+                        <span class="nav-badge">5</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="admin-header">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+
+                <div class="header-left">
+                    <h1>Customer Testimonials</h1>
+                    <p>Review and manage customer feedback and testimonials</p>
+                </div>
+
+                <div class="header-right">
+                    <div class="header-search">
+                        <svg class="header-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" placeholder="Search testimonials...">
+                    </div>
+
+                    <div class="header-actions">
+                        <button class="header-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            <span class="notification-badge"></span>
+                        </button>
+
+                        <div class="user-menu">
+                            <div class="user-avatar">HM</div>
+                            <div class="user-info">
+                                <div class="user-name">Hassan Mohamed</div>
+                                <div class="user-role">Admin</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <!-- Stats Grid -->
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Total Reviews</div>
+                            <div class="stat-icon" style="background: var(--primary); color: var(--primary-foreground);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">48</div>
+                        <div class="stat-change">All time</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Pending</div>
+                            <div class="stat-icon" style="background: var(--warning); color: var(--warning-foreground);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12,6 12,12 16,14"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">5</div>
+                        <div class="stat-change">Awaiting review</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Approved</div>
+                            <div class="stat-icon" style="background: var(--success); color: var(--success-foreground);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20,6 9,17 4,12"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">41</div>
+                        <div class="stat-change">Published reviews</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Rejected</div>
+                            <div class="stat-icon" style="background: var(--destructive); color: var(--destructive-foreground);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">2</div>
+                        <div class="stat-change">Not published</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Average Rating</div>
+                            <div class="stat-icon" style="background: var(--gold); color: var(--foreground);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">4.6</div>
+                        <div class="stat-change">★ Rating</div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="card" style="margin-bottom: 2rem;">
+                    <div class="card-content">
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <div style="flex: 1; position: relative;">
+                                    <svg style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--muted-foreground); width: 1rem; height: 1rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <path d="m21 21-4.35-4.35"></path>
+                                    </svg>
+                                    <input type="text" id="searchInput" placeholder="Search by customer name, product, or review title..." style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--background);">
+                                </div>
+                                <select id="statusFilter" style="padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--background);">
+                                    <option value="all">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                                <select id="ratingFilter" style="padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--background);">
+                                    <option value="all">All Ratings</option>
+                                    <option value="5">5 Stars</option>
+                                    <option value="4">4 Stars</option>
+                                    <option value="3">3 Stars</option>
+                                    <option value="2">2 Stars</option>
+                                    <option value="1">1 Star</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonials Grid -->
+                <div class="testimonials-grid" id="testimonialsGrid">
+                    <!-- Testimonial Card 1 -->
+                    <div class="testimonial-card" data-status="pending" data-rating="5">
+                        <div class="testimonial-header">
+                            <div class="customer-info">
+                                <div class="customer-avatar">S</div>
+                                <div class="customer-details">
+                                    <h4>Sarah Ahmed</h4>
+                                    <p>Cairo, Egypt</p>
+                                </div>
+                            </div>
+                            <span class="status-badge pending">Pending</span>
+                        </div>
+
+                        <div class="product-info">
+                            <img src="https://via.placeholder.com/48x48/f0f0f0/cccccc?text=Shirt" alt="Elegant Casual Shirt" class="product-image">
+                            <div class="product-details">
+                                <h5>Elegant Casual Shirt</h5>
+                                <p>Women • Shirts</p>
+                            </div>
+                        </div>
+
+                        <div class="rating-display">
+                            <div class="stars">
+                                <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                            </div>
+                            <span class="rating-text">(5/5)</span>
+                        </div>
+
+                        <h3 class="review-title">Amazing quality and perfect fit!</h3>
+                        <p class="review-comment">I absolutely love this shirt! The fabric is so comfortable and the fit is perfect. The delivery was also very fast. I will definitely order more items from NileStyle.</p>
+
+                        <div class="review-images">
+                            <img src="https://via.placeholder.com/64x64/f0f0f0/cccccc?text=Img1" alt="Review image 1" class="review-image">
+                            <img src="https://via.placeholder.com/64x64/f0f0f0/cccccc?text=Img2" alt="Review image 2" class="review-image">
+                        </div>
+
+                        <div class="testimonial-footer">
+                            <div class="footer-info">
+                                <div>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    2024-12-15
+                                </div>
+                                <div>Order: #2456</div>
+                            </div>
+                            <div class="testimonial-actions">
+                                <button class="action-btn view" onclick="viewTestimonial('rev_001')" title="View Details">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                                <button class="action-btn approve" onclick="updateTestimonialStatus('rev_001', 'approved')" title="Approve">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20,6 9,17 4,12"></polyline>
+                                    </svg>
+                                </button>
+                                <button class="action-btn reject" onclick="updateTestimonialStatus('rev_001', 'rejected')" title="Reject">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial Card 2 -->
+                    <div class="testimonial-card" data-status="approved" data-rating="4">
+                        <div class="testimonial-header">
+                            <div class="customer-info">
+                                <div class="customer-avatar">M</div>
+                                <div class="customer-details">
+                                    <h4>Mohamed Hassan</h4>
+                                    <p>Alexandria, Egypt</p>
+                                </div>
+                            </div>
+                            <span class="status-badge approved">Approved</span>
+                        </div>
+
+                        <div class="product-info">
+                            <img src="https://via.placeholder.com/48x48/f0f0f0/cccccc?text=TShirt" alt="Classic Cotton T-Shirt" class="product-image">
+                            <div class="product-details">
+                                <h5>Classic Cotton T-Shirt</h5>
+                                <p>Men • T-Shirts</p>
+                            </div>
+                        </div>
+
+                        <div class="rating-display">
+                            <div class="stars">
+                                <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <svg class="star empty" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                            </div>
+                            <span class="rating-text">(4/5)</span>
+                        </div>
+
+                        <h3 class="review-title">Good quality t-shirt</h3>
+                        <p class="review-comment">Nice t-shirt with good quality cotton. The size was accurate and the color is as shown in the pictures. Shipping was a bit slow but overall satisfied.</p>
+
+                        <div class="testimonial-footer">
+                            <div class="footer-info">
+                                <div>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    2024-12-14
+                                </div>
+                                <div>Order: #2455</div>
+                            </div>
+                            <div class="testimonial-actions">
+                                <button class="action-btn view" onclick="viewTestimonial('rev_002')" title="View Details">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                                <button class="action-btn reject" onclick="updateTestimonialStatus('rev_002', 'rejected')" title="Reject">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial Card 3 -->
+                    <div class="testimonial-card" data-status="pending" data-rating="5">
+                        <div class="testimonial-header">
+                            <div class="customer-info">
+                                <div class="customer-avatar">F</div>
+                                <div class="customer-details">
+                                    <h4>Fatma Ali</h4>
+                                    <p>Giza, Egypt</p>
+                                </div>
+                            </div>
+                            <span class="status-badge pending">Pending</span>
+                        </div>
+
+                        <div class="product-info">
+                            <img src="https://via.placeholder.com/48x48/f0f0f0/cccccc?text=Pants" alt="Stylish Palazzo Pants" class="product-image">
+                            <div class="product-details">
+                                <h5>Stylish Palazzo Pants</h5>
+                                <p>Women • Pants</p>
+                            </div>
+                        </div>
+
+                        <div class="rating-display">
+                            <div class="stars">
+                                <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <svg class="star" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                            </div>
+                            <span class="rating-text">(5/5)</span>
+                        </div>
+
+                        <h3 class="review-title">Perfect for summer!</h3>
+                        <p class="review-comment">These palazzo pants are exactly what I was looking for! They are flowy, comfortable, and perfect for the Egyptian summer. The material is breathable and the design is very elegant.</p>
+
+                        <div class="testimonial-footer">
+                            <div class="footer-info">
+                                <div>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    2024-12-13
+                                </div>
+                                <div>Order: #2454</div>
+                            </div>
+                            <div class="testimonial-actions">
+                                <button class="action-btn view" onclick="viewTestimonial('rev_003')" title="View Details">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                                <button class="action-btn approve" onclick="updateTestimonialStatus('rev_003', 'approved')" title="Approve">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20,6 9,17 4,12"></polyline>
+                                    </svg>
+                                </button>
+                                <button class="action-btn reject" onclick="updateTestimonialStatus('rev_003', 'rejected')" title="Reject">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Testimonial Detail Modal -->
+    <div id="testimonialModal" class="testimonial-modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--foreground);">Review Details</h3>
+                <button onclick="closeTestimonialModal()" style="background: none; border: none; color: var(--muted-foreground); cursor: pointer; padding: 0.25rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Update testimonial status
+        function updateTestimonialStatus(testimonialId, newStatus) {
+            // Find the testimonial card and update its status
+            const cards = document.querySelectorAll('.testimonial-card');
+            cards.forEach(card => {
+                // For demo purposes, we'll update the first card that matches
+                if (card.querySelector('.customer-avatar').textContent === testimonialId.charAt(testimonialId.length - 1).toUpperCase()) {
+                    card.setAttribute('data-status', newStatus);
+                    
+                    // Update the status badge
+                    const statusBadge = card.querySelector('.status-badge');
+                    statusBadge.className = `status-badge ${newStatus}`;
+                    statusBadge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                    
+                    // Update action buttons
+                    const actions = card.querySelector('.testimonial-actions');
+                    const viewBtn = actions.querySelector('.view');
+                    actions.innerHTML = '';
+                    actions.appendChild(viewBtn);
+                    
+                    if (newStatus === 'pending') {
+                        actions.innerHTML += `
+                            <button class="action-btn approve" onclick="updateTestimonialStatus('${testimonialId}', 'approved')" title="Approve">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20,6 9,17 4,12"></polyline>
+                                </svg>
+                            </button>
+                            <button class="action-btn reject" onclick="updateTestimonialStatus('${testimonialId}', 'rejected')" title="Reject">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        `;
+                    } else if (newStatus === 'approved') {
+                        actions.innerHTML += `
+                            <button class="action-btn reject" onclick="updateTestimonialStatus('${testimonialId}', 'rejected')" title="Reject">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        `;
+                    } else if (newStatus === 'rejected') {
+                        actions.innerHTML += `
+                            <button class="action-btn approve" onclick="updateTestimonialStatus('${testimonialId}', 'approved')" title="Approve">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20,6 9,17 4,12"></polyline>
+                                </svg>
+                            </button>
+                        `;
+                    }
+                    
+                    // Re-add the view button
+                    actions.insertBefore(viewBtn, actions.firstChild);
+                }
+            });
+        }
+
+        // View testimonial details
+        function viewTestimonial(testimonialId) {
+            // Sample data - in a real app, this would come from your data source
+            const testimonialData = {
+                rev_001: {
+                    customer: { name: 'Sarah Ahmed', email: 'sarah@example.com', location: 'Cairo, Egypt' },
+                    product: { name: 'Elegant Casual Shirt', category: 'Women • Shirts' },
+                    rating: 5,
+                    title: 'Amazing quality and perfect fit!',
+                    comment: 'I absolutely love this shirt! The fabric is so comfortable and the fit is perfect. The delivery was also very fast. I will definitely order more items from NileStyle. The customer service was also excellent and they helped me with sizing questions.',
+                    orderNumber: '#2456',
+                    date: '2024-12-15',
+                    status: 'pending',
+                    images: [
+                        'https://via.placeholder.com/200x200/f0f0f0/cccccc?text=Review+Image+1',
+                        'https://via.placeholder.com/200x200/f0f0f0/cccccc?text=Review+Image+2'
+                    ]
+                },
+                rev_002: {
+                    customer: { name: 'Mohamed Hassan', email: 'mohamed@example.com', location: 'Alexandria, Egypt' },
+                    product: { name: 'Classic Cotton T-Shirt', category: 'Men • T-Shirts' },
+                    rating: 4,
+                    title: 'Good quality t-shirt',
+                    comment: 'Nice t-shirt with good quality cotton. The size was accurate and the color is as shown in the pictures. Shipping was a bit slow but overall satisfied with the purchase.',
+                    orderNumber: '#2455',
+                    date: '2024-12-14',
+                    status: 'approved'
+                },
+                rev_003: {
+                    customer: { name: 'Fatma Ali', email: 'fatma@example.com', location: 'Giza, Egypt' },
+                    product: { name: 'Stylish Palazzo Pants', category: 'Women • Pants' },
+                    rating: 5,
+                    title: 'Perfect for summer!',
+                    comment: 'These palazzo pants are exactly what I was looking for! They are flowy, comfortable, and perfect for the Egyptian summer. The material is breathable and the design is very elegant.',
+                    orderNumber: '#2454',
+                    date: '2024-12-13',
+                    status: 'pending'
+                }
+            };
+
+            const data = testimonialData[testimonialId];
+            if (!data) return;
+
+            const stars = Array.from({length: 5}, (_, i) => 
+                `<svg class="star ${i < data.rating ? '' : 'empty'}" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>`
+            ).join('');
+
+            document.getElementById('modalBody').innerHTML = `
+                <div class="customer-section">
+                    <div class="customer-avatar">${data.customer.name.charAt(0)}</div>
+                    <div>
+                        <div style="font-weight: 600; color: var(--foreground);">${data.customer.name}</div>
+                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">${data.customer.email}</div>
+                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">${data.customer.location}</div>
+                    </div>
+                </div>
+
+                <div class="product-section">
+                    <img src="https://via.placeholder.com/64x64/f0f0f0/cccccc?text=Product" alt="${data.product.name}" class="product-image">
+                    <div>
+                        <div style="font-weight: 600; color: var(--foreground);">${data.product.name}</div>
+                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">${data.product.category}</div>
+                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">Order: ${data.orderNumber}</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <div class="rating-display">
+                        <div class="stars">${stars}</div>
+                        <span class="rating-text">(${data.rating}/5)</span>
+                    </div>
+                    <h4 style="font-size: 1.125rem; font-weight: 600; color: var(--foreground);">${data.title}</h4>
+                </div>
+
+                <div class="full-comment">${data.comment}</div>
+
+                ${data.images ? `
+                    <div style="margin-bottom: 1.5rem;">
+                        <h5 style="font-weight: 500; color: var(--foreground); margin-bottom: 0.75rem;">Review Images</h5>
+                        <div class="modal-images">
+                            ${data.images.map(img => `<img src="${img}" alt="Review image" class="modal-image">`).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                <div class="modal-actions">
+                    ${data.status === 'pending' ? `
+                        <button class="modal-btn approve" onclick="updateTestimonialStatus('${testimonialId}', 'approved'); closeTestimonialModal();">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20,6 9,17 4,12"></polyline>
+                            </svg>
+                            Approve Review
+                        </button>
+                        <button class="modal-btn reject" onclick="updateTestimonialStatus('${testimonialId}', 'rejected'); closeTestimonialModal();">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                            Reject Review
+                        </button>
+                    ` : data.status === 'approved' ? `
+                        <button class="modal-btn reject" onclick="updateTestimonialStatus('${testimonialId}', 'rejected'); closeTestimonialModal();">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                            Reject Review
+                        </button>
+                    ` : `
+                        <button class="modal-btn approve" onclick="updateTestimonialStatus('${testimonialId}', 'approved'); closeTestimonialModal();">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20,6 9,17 4,12"></polyline>
+                            </svg>
+                            Approve Review
+                        </button>
+                    `}
+                </div>
+            `;
+
+            document.getElementById('testimonialModal').classList.remove('hidden');
+        }
+
+        // Close testimonial modal
+        function closeTestimonialModal() {
+            document.getElementById('testimonialModal').classList.add('hidden');
+        }
+
+        // Filter functionality
+        document.getElementById('searchInput').addEventListener('input', filterTestimonials);
+        document.getElementById('statusFilter').addEventListener('change', filterTestimonials);
+        document.getElementById('ratingFilter').addEventListener('change', filterTestimonials);
+
+        function filterTestimonials() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const ratingFilter = document.getElementById('ratingFilter').value;
+            const cards = document.querySelectorAll('.testimonial-card');
+
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                const status = card.getAttribute('data-status');
+                const rating = card.getAttribute('data-rating');
+
+                const matchesSearch = text.includes(searchTerm);
+                const matchesStatus = statusFilter === 'all' || status === statusFilter;
+                const matchesRating = ratingFilter === 'all' || rating === ratingFilter;
+
+                if (matchesSearch && matchesStatus && matchesRating) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('testimonialModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeTestimonialModal();
+            }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (window.innerWidth <= 1024) {
+                if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

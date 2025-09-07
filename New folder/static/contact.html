@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - NileStyle</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta name="description" content="Get in touch with NileStyle customer service. Contact us for questions, complaints, or support.">
+    <style>
+        .contact-form {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--foreground);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary);
+            opacity: 0.2;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .contact-info {
+            background: var(--sand);
+            border-radius: var(--radius);
+            padding: 2rem;
+        }
+
+        .contact-info h3 {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--foreground);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            color: var(--muted-foreground);
+        }
+
+        .contact-icon {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            padding: 0.5rem;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <!-- Logo -->
+            <a href="index.html" class="logo">NileStyle</a>
+
+            <!-- Desktop Navigation -->
+            <nav class="nav">
+                <a href="men.html">Men</a>
+                <a href="women.html">Women</a>
+                <a href="products.html">All Products</a>
+                <a href="about.html">About</a>
+                <a href="contact.html" style="color: var(--primary);">Contact</a>
+            </nav>
+
+            <!-- Header Icons -->
+            <div class="header-icons">
+                <button class="icon-btn" aria-label="Search">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+
+                <button class="icon-btn" aria-label="Wishlist">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"></path>
+                    </svg>
+                </button>
+
+                <button class="icon-btn" aria-label="User Account">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </button>
+
+                <button class="icon-btn cart-badge" aria-label="Shopping Cart">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                        <path d="M3 6h18"></path>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                </button>
+
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="4" x2="20" y1="6" y2="6"></line>
+                        <line x1="4" x2="20" y1="12" y2="12"></line>
+                        <line x1="4" x2="20" y1="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobileMenu" class="mobile-menu">
+            <a href="men.html">Men</a>
+            <a href="women.html">Women</a>
+            <a href="products.html">All Products</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="section">
+            <div class="container">
+                <!-- Page Header -->
+                <div style="text-align: center; margin-bottom: 3rem;">
+                    <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem;">Contact Us</h1>
+                    <p style="color: var(--muted-foreground); max-width: 32rem; margin: 0 auto;">
+                        Have a question or need assistance? We're here to help! Get in touch with our customer service team.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2" style="gap: 3rem; align-items: start;">
+                    <!-- Contact Form -->
+                    <div class="contact-form">
+                        <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem;">Send us a Message</h2>
+                        
+                        <form id="contactForm" onsubmit="handleContactSubmit(event)">
+                            <div class="form-group">
+                                <label for="name">Full Name *</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email Address *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" placeholder="+20 XXX XXX XXXX">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="category">Subject Category *</label>
+                                <select id="category" name="category" required>
+                                    <option value="">Select a category</option>
+                                    <option value="question">General Question</option>
+                                    <option value="complaint">Complaint</option>
+                                    <option value="order">Order Inquiry</option>
+                                    <option value="return">Return/Exchange</option>
+                                    <option value="shipping">Shipping Question</option>
+                                    <option value="product">Product Information</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="subject">Subject *</label>
+                                <input type="text" id="subject" name="subject" required placeholder="Brief description of your inquiry">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="message">Message *</label>
+                                <textarea id="message" name="message" required placeholder="Please provide details about your inquiry..."></textarea>
+                            </div>
+
+                            <button type="submit" class="submit-btn">Send Message</button>
+                        </form>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="contact-info">
+                        <h3>Get in Touch</h3>
+                        <p style="color: var(--muted-foreground); margin-bottom: 2rem;">
+                            We're here to help with any questions about our products, orders, or services.
+                        </p>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                            </div>
+                            <div>
+                                <strong>Email</strong><br>
+                                hello@nilestyle.com
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <strong>Phone</strong><br>
+                                +20 123 456 789
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </div>
+                            <div>
+                                <strong>Address</strong><br>
+                                Cairo, Egypt
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12,6 12,12 16,14"></polyline>
+                                </svg>
+                            </div>
+                            <div>
+                                <strong>Business Hours</strong><br>
+                                Sun - Thu: 9 AM - 8 PM<br>
+                                Fri - Sat: 10 AM - 6 PM
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+                            <h4 style="font-weight: 600; margin-bottom: 1rem;">Follow Us</h4>
+                            <div style="display: flex; gap: 1rem;">
+                                <a href="#" style="background: var(--primary); color: var(--primary-foreground); padding: 0.5rem; border-radius: 50%; text-decoration: none; font-weight: bold; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center;">f</a>
+                                <a href="#" style="background: var(--primary); color: var(--primary-foreground); padding: 0.5rem; border-radius: 50%; text-decoration: none; font-weight: bold; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center;">ig</a>
+                                <a href="#" style="background: var(--primary); color: var(--primary-foreground); padding: 0.5rem; border-radius: 50%; text-decoration: none; font-weight: bold; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center;">tw</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ Section -->
+                <div style="margin-top: 4rem; text-align: center;">
+                    <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">Frequently Asked Questions</h3>
+                    <p style="color: var(--muted-foreground); margin-bottom: 2rem;">
+                        Find answers to common questions about our products and services.
+                    </p>
+                    <a href="faq.html" class="btn btn-outline">View FAQ</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <!-- Company Info -->
+                <div class="footer-section">
+                    <h3>NileStyle</h3>
+                    <p>
+                        Modern Egyptian fashion for the contemporary wardrobe. Quality clothing
+                        designed for the style-conscious individual.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">f</a>
+                        <a href="#" class="social-link">ig</a>
+                        <a href="#" class="social-link">tw</a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="men.html">Men's Collection</a>
+                    <a href="women.html">Women's Collection</a>
+                    <a href="faq.html">FAQ</a>
+                    <a href="contact.html">Contact Us</a>
+                </div>
+
+                <!-- Customer Service -->
+                <div class="footer-section">
+                    <h4>Customer Service</h4>
+                    <a href="#">Shipping Info</a>
+                    <a href="#">Returns & Exchanges</a>
+                    <a href="#">Size Guide</a>
+                    <a href="#">Track Your Order</a>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="footer-section">
+                    <h4>Get in Touch</h4>
+                    <p>📧 hello@nilestyle.com</p>
+                    <p>📞 +20 123 456 789</p>
+                    <p>📍 Cairo, Egypt</p>
+                    <div class="footer-promo">
+                        <p>✨ Free shipping on orders over 500 EGP</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div class="footer-bottom">
+                <p>© 2024 NileStyle. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Contact form handler
+        function handleContactSubmit(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const submitBtn = form.querySelector('.submit-btn');
+            
+            // Validate form
+            if (!validateForm(form)) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            
+            // Get form data
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            
+            // Simulate API call
+            setTimeout(() => {
+                alert(`Thank you, ${data.name}! Your message has been sent. We'll get back to you within 24 hours.`);
+                
+                // Reset form
+                form.reset();
+                
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Message';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

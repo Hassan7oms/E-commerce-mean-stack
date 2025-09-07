@@ -1,0 +1,697 @@
+<!-- Products Management -->
+<div class="fade-in">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Products Management</h1>
+      <p>Manage your product catalog - Add, edit, and organize products</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="openAddModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Add Product
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="search-box">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Search products by title, description or slug..." 
+          [(ngModel)]="searchTerm"
+          (input)="searchProducts()"
+        >
+      </div>
+
+      <select [(ngModel)]="selectedCategory" (change)="filterByCategory()" class="filter-select">
+        <option value="">All Categories</option>
+        <option *ngFor="let category of categories" [value]="category._id">
+          {{ category.name }}
+        </option>
+      </select>
+
+      <select [(ngModel)]="selectedStatus" (change)="filterByStatus()" class="filter-select">
+        <option value="">All Status</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="deleted">Deleted</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-item">
+      <span class="stat-label">Total Products:</span>
+      <span class="stat-value">{{ products.length }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Filtered Results:</span>
+      <span class="stat-value">{{ filteredProducts.length }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Current Page:</span>
+      <span class="stat-value">{{ currentPage }} / {{ totalPages }}</span>
+    </div>
+  </div>
+
+  <!-- Products Table -->
+  <div class="table-container">
+    <div class="table-header">
+      <h3>Products ({{ getPaginatedProducts().length }} of {{ filteredProducts.length }})</h3>
+      <div class="table-actions">
+        <button class="btn btn-outline">Export</button>
+        <button class="btn btn-outline">Import</button>
+      </div>
+    </div>
+
+    <div class="table-wrapper" *ngIf="!loading">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Price Range</th>
+            <th>Total Stock</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of getPaginatedProducts()">
+            <td>
+              <div class="product-info">
+                <img [src]="getProductImage(product)" [alt]="product.title" class="product-image">
+                <div class="product-details">
+                  <h4>{{ product.title }}</h4>
+                  <p class="product-slug">{{ product.slug }}</p>
+                  <p class="product-description">{{ product.description | slice:0:50 }}{{ product.description.length > 50 ? '...' : '' }}</p>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="category-list">{{ getCategoryNames(product) }}</span>
+            </td>
+            <td>
+              <span class="price-range">{{ formatPrice(product) }}</span>
+            </td>
+            <td>
+              <span [class]="getTotalStock(product) <= 10 ? 'stock-low' : (getTotalStock(product) <= 50 ? 'stock-medium' : 'stock-high')">
+                {{ getTotalStock(product) }} units
+              </span>
+              <div class="variant-count">{{ product.variant.length }} variant(s)</div>
+            </td>
+            <td>
+              <span [class]="getStatusClass(product)">
+                {{ getStatusText(product) }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button 
+                  class="action-btn edit" 
+                  (click)="openEditModal(product)"
+                  title="Edit Product">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </button>
+                
+                <button 
+                  class="action-btn toggle" 
+                  (click)="toggleProductStatus(product)"
+                  [title]="product.isActive ? 'Deactivate Product' : 'Activate Product'"
+                  [disabled]="product.isDeleted">
+                  <svg *ngIf="product.isActive" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                  <svg *ngIf="!product.isActive" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+                    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 11 8 11 8a13.16 13.16 0 0 1-1.67 2.68"></path>
+                    <path d="M6.61 6.61A13.526 13.526 0 0 0 1 12s4 8 11 8a9.74 9.74 0 0 0 5.39-1.61"></path>
+                    <line x1="2" y1="2" x2="22" y2="22"></line>
+                  </svg>
+                </button>
+                
+                <button 
+                  class="action-btn delete" 
+                  (click)="deleteProduct(product)"
+                  title="Soft Delete Product"
+                  [disabled]="product.isDeleted">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button 
+        class="page-btn" 
+        (click)="changePage(currentPage - 1)" 
+        [disabled]="currentPage === 1">
+        Previous
+      </button>
+      
+      <button 
+        *ngFor="let page of getPageNumbers()" 
+        class="page-btn" 
+        [class.active]="page === currentPage"
+        (click)="changePage(page)">
+        {{ page }}
+      </button>
+      
+      <button 
+        class="page-btn" 
+        (click)="changePage(currentPage + 1)" 
+        [disabled]="currentPage === totalPages">
+        Next
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Loading products...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!loading && filteredProducts.length === 0 && products.length > 0">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.35-4.35"></path>
+      </svg>
+      <h3>No products match your filters</h3>
+      <p>Try adjusting your search or filter criteria.</p>
+      <button class="btn btn-outline" (click)="searchTerm = ''; selectedCategory = ''; selectedStatus = ''; applyFilters()">Clear Filters</button>
+    </div>
+
+    <!-- No Products State -->
+    <div class="empty-state" *ngIf="!loading && products.length === 0">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+      </svg>
+      <h3>No products found</h3>
+      <p>Start by adding your first product to the catalog.</p>
+      <button class="btn btn-primary" (click)="openAddModal()">Add Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Add New Product</h2>
+      <button class="modal-close" (click)="closeAddModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    
+    <form [formGroup]="productForm" (ngSubmit)="addProduct()" class="product-form">
+      <div class="form-grid">
+        <!-- Basic Information -->
+        <div class="form-section">
+          <h3>Basic Information</h3>
+          
+          <div class="form-group">
+            <label for="title">Product Title*</label>
+            <input 
+              type="text" 
+              id="title" 
+              formControlName="title"
+              (input)="onTitleChange($event, 'add')"
+              [class.error]="isFieldInvalid('title', productForm)"
+              placeholder="Enter product title">
+            <div class="error-message" *ngIf="isFieldInvalid('title', productForm)">
+              {{ getFieldError('title', productForm) }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="slug">Product Slug*</label>
+            <input 
+              type="text" 
+              id="slug" 
+              formControlName="slug"
+              [class.error]="isFieldInvalid('slug', productForm)"
+              placeholder="product-slug">
+            <div class="error-message" *ngIf="isFieldInvalid('slug', productForm)">
+              {{ getFieldError('slug', productForm) }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description*</label>
+            <textarea 
+              id="description" 
+              formControlName="description"
+              [class.error]="isFieldInvalid('description', productForm)"
+              placeholder="Enter product description"
+              rows="4"></textarea>
+            <div class="error-message" *ngIf="isFieldInvalid('description', productForm)">
+              {{ getFieldError('description', productForm) }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="categories">Categories*</label>
+            <select 
+              id="categories" 
+              formControlName="categoryID" 
+              multiple
+              [class.error]="isFieldInvalid('categoryID', productForm)">
+              <option *ngFor="let category of categories" [value]="category._id">
+                {{ category.name }}
+              </option>
+            </select>
+            <div class="error-message" *ngIf="isFieldInvalid('categoryID', productForm)">
+              {{ getFieldError('categoryID', productForm) }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Attributes -->
+        <div class="form-section">
+          <h3>Attributes</h3>
+          
+          <div class="form-group">
+            <label for="material">Material*</label>
+            <input 
+              type="text" 
+              id="material" 
+              formControlName="material"
+              [class.error]="isFieldInvalid('material', productForm)"
+              placeholder="e.g., Cotton, Polyester">
+            <div class="error-message" *ngIf="isFieldInvalid('material', productForm)">
+              {{ getFieldError('material', productForm) }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="origin">Origin*</label>
+            <input 
+              type="text" 
+              id="origin" 
+              formControlName="origin"
+              [class.error]="isFieldInvalid('origin', productForm)"
+              placeholder="e.g., Egypt, Turkey">
+            <div class="error-message" *ngIf="isFieldInvalid('origin', productForm)">
+              {{ getFieldError('origin', productForm) }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="images">Product Images</label>
+            <input 
+              type="file" 
+              id="images" 
+              accept="image/*"
+              (change)="onFileSelected($event, 'add')">
+          </div>
+        </div>
+      </div>
+
+      <!-- Variants -->
+      <div class="form-section">
+        <div class="section-header">
+          <h3>Product Variants</h3>
+          <button type="button" class="btn btn-outline" (click)="addVariant('add')">Add Variant</button>
+        </div>
+        
+        <div formArrayName="variants" class="variants-container">
+          <div 
+            *ngFor="let variant of variants.controls; let i = index" 
+            [formGroupName]="i" 
+            class="variant-card">
+            <div class="variant-header">
+              <h4>Variant {{ i + 1 }}</h4>
+              <button 
+                type="button" 
+                class="btn-remove" 
+                (click)="removeVariant(i, 'add')"
+                [disabled]="variants.length === 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            
+            <div class="variant-fields">
+              <div class="form-group">
+                <label>Color</label>
+                <input type="text" formControlName="color" placeholder="e.g., Red, Blue">
+              </div>
+              
+              <div class="form-group">
+                <label>Size</label>
+                <input type="text" formControlName="size" placeholder="e.g., S, M, L, XL">
+              </div>
+              
+              <div class="form-group">
+                <label>Price*</label>
+                <input type="number" formControlName="price" placeholder="0.00" min="0" step="0.01">
+              </div>
+              
+              <div class="form-group">
+                <label>Available Quantity*</label>
+                <input type="number" formControlName="QTyavailable" placeholder="0" min="0">
+              </div>
+              
+              <div class="form-group">
+                <label>Reserved Quantity</label>
+                <input type="number" formControlName="Qtyreserved" placeholder="0" min="0">
+              </div>
+              
+              <div class="form-group">
+                <label>Reorder Point*</label>
+                <input type="number" formControlName="reorderPoint" placeholder="5" min="0">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Upload Section -->
+      <div class="form-section image-upload-section">
+        <h3>Product Images</h3>
+        
+        <!-- Upload Images -->
+        <div class="image-upload-container" 
+             (click)="addFileInput.click()"
+             (dragover)="onDragOver($event)"
+             (dragleave)="onDragLeave($event)"
+             (drop)="onDrop($event)"
+             [class.dragover]="isDragOver">
+          
+          <input 
+            #addFileInput
+            type="file" 
+            class="image-upload-input"
+            multiple
+            accept="image/*"
+            (change)="onFileSelect($event)">
+          
+          <div class="upload-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7,10 12,15 17,10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </div>
+          
+          <div class="upload-text">Drop images here or click to browse</div>
+          <div class="upload-hint">Support: JPG, PNG, GIF up to 5MB each</div>
+        </div>
+
+        <!-- Images Preview -->
+        <div class="image-preview" *ngIf="selectedFiles.length > 0">
+          <div class="preview-item" *ngFor="let file of selectedFiles; let i = index">
+            <img [src]="file.preview" [alt]="file.name" class="preview-image">
+            <button 
+              type="button" 
+              class="preview-remove" 
+              (click)="removeSelectedFile(i)"
+              title="Remove image">
+              ×
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" (click)="closeAddModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!productForm.valid || loading">
+          {{ loading ? 'Creating...' : 'Create Product' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Product: {{ editingProduct?.title }}</h2>
+      <button class="modal-close" (click)="closeEditModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    
+    <form [formGroup]="editForm" (ngSubmit)="updateProduct()" class="product-form">
+      <div class="form-grid">
+        <!-- Basic Information -->
+        <div class="form-section">
+          <h3>Basic Information</h3>
+          
+          <div class="form-group">
+            <label for="edit-title">Product Title*</label>
+            <input 
+              type="text" 
+              id="edit-title" 
+              formControlName="title"
+              (input)="onTitleChange($event, 'edit')"
+              [class.error]="isFieldInvalid('title', editForm)"
+              placeholder="Enter product title">
+            <div class="error-message" *ngIf="isFieldInvalid('title', editForm)">
+              {{ getFieldError('title', editForm) }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-slug">Product Slug*</label>
+            <input 
+              type="text" 
+              id="edit-slug" 
+              formControlName="slug"
+              [class.error]="isFieldInvalid('slug', editForm)"
+              placeholder="product-slug">
+            <div class="error-message" *ngIf="isFieldInvalid('slug', editForm)">
+              {{ getFieldError('slug', editForm) }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-description">Description*</label>
+            <textarea 
+              id="edit-description" 
+              formControlName="description"
+              [class.error]="isFieldInvalid('description', editForm)"
+              placeholder="Enter product description"
+              rows="4"></textarea>
+            <div class="error-message" *ngIf="isFieldInvalid('description', editForm)">
+              {{ getFieldError('description', editForm) }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-categories">Categories*</label>
+            <select 
+              id="edit-categories" 
+              formControlName="categoryID" 
+              multiple
+              [class.error]="isFieldInvalid('categoryID', editForm)">
+              <option *ngFor="let category of categories" [value]="category._id">
+                {{ category.name }}
+              </option>
+            </select>
+            <div class="error-message" *ngIf="isFieldInvalid('categoryID', editForm)">
+              {{ getFieldError('categoryID', editForm) }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Attributes -->
+        <div class="form-section">
+          <h3>Attributes</h3>
+          
+          <div class="form-group">
+            <label for="edit-material">Material*</label>
+            <input 
+              type="text" 
+              id="edit-material" 
+              formControlName="material"
+              [class.error]="isFieldInvalid('material', editForm)"
+              placeholder="e.g., Cotton, Polyester">
+            <div class="error-message" *ngIf="isFieldInvalid('material', editForm)">
+              {{ getFieldError('material', editForm) }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-origin">Origin*</label>
+            <input 
+              type="text" 
+              id="edit-origin" 
+              formControlName="origin"
+              [class.error]="isFieldInvalid('origin', editForm)"
+              placeholder="e.g., Egypt, Turkey">
+            <div class="error-message" *ngIf="isFieldInvalid('origin', editForm)">
+              {{ getFieldError('origin', editForm) }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Variants -->
+      <div class="form-section">
+        <div class="section-header">
+          <h3>Product Variants</h3>
+          <button type="button" class="btn btn-outline" (click)="addVariant('edit')">Add Variant</button>
+        </div>
+        
+        <div formArrayName="variants" class="variants-container">
+          <div 
+            *ngFor="let variant of editVariants.controls; let i = index" 
+            [formGroupName]="i" 
+            class="variant-card">
+            <div class="variant-header">
+              <h4>Variant {{ i + 1 }}</h4>
+              <button 
+                type="button" 
+                class="btn-remove" 
+                (click)="removeVariant(i, 'edit')"
+                [disabled]="editVariants.length === 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            
+            <div class="variant-fields">
+              <div class="form-group">
+                <label>Color</label>
+                <input type="text" formControlName="color" placeholder="e.g., Red, Blue">
+              </div>
+              
+              <div class="form-group">
+                <label>Size</label>
+                <input type="text" formControlName="size" placeholder="e.g., S, M, L, XL">
+              </div>
+              
+              <div class="form-group">
+                <label>Price*</label>
+                <input type="number" formControlName="price" placeholder="0.00" min="0" step="0.01">
+              </div>
+              
+              <div class="form-group">
+                <label>Available Quantity*</label>
+                <input type="number" formControlName="QTyavailable" placeholder="0" min="0">
+              </div>
+              
+              <div class="form-group">
+                <label>Reserved Quantity</label>
+                <input type="number" formControlName="Qtyreserved" placeholder="0" min="0">
+              </div>
+              
+              <div class="form-group">
+                <label>Reorder Point*</label>
+                <input type="number" formControlName="reorderPoint" placeholder="5" min="0">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Upload Section -->
+      <div class="form-section image-upload-section">
+        <h3>Product Images</h3>
+        
+        <!-- Current Images -->
+        <ng-container *ngIf="editingProduct">
+          <div class="current-images" *ngIf="getCurrentImages().length > 0">
+            <h4>Current Images</h4>
+            <div class="image-preview">
+              <div class="preview-item" *ngFor="let image of getCurrentImages(); let i = index">
+                <img [src]="image" [alt]="'Product image ' + (i + 1)" class="preview-image">
+                <button 
+                  type="button" 
+                  class="preview-remove" 
+                  (click)="removeExistingImage(i)"
+                  title="Remove image">
+                  ×
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Upload New Images -->
+        <div class="image-upload-container" 
+             (click)="fileInput.click()"
+             (dragover)="onDragOver($event)"
+             (dragleave)="onDragLeave($event)"
+             (drop)="onDrop($event)"
+             [class.dragover]="isDragOver">
+          
+          <input 
+            #fileInput
+            type="file" 
+            class="image-upload-input"
+            multiple
+            accept="image/*"
+            (change)="onFileSelect($event)">
+          
+          <div class="upload-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7,10 12,15 17,10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </div>
+          
+          <div class="upload-text">Drop images here or click to browse</div>
+          <div class="upload-hint">Support: JPG, PNG, GIF up to 5MB each</div>
+        </div>
+
+        <!-- New Images Preview -->
+        <div class="image-preview" *ngIf="selectedFiles.length > 0">
+          <div class="preview-item" *ngFor="let file of selectedFiles; let i = index">
+            <img [src]="file.preview" [alt]="file.name" class="preview-image">
+            <button 
+              type="button" 
+              class="preview-remove" 
+              (click)="removeSelectedFile(i)"
+              title="Remove image">
+              ×
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" (click)="closeEditModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!editForm.valid || loading">
+          {{ loading ? 'Updating...' : 'Update Product' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

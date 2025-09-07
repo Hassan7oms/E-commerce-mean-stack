@@ -1,0 +1,129 @@
+/* Use for both login.component.css and register.component.css */
+
+:host {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f7fafc;
+  }
+  
+  .auth-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 2rem;
+  }
+  
+  .auth-wrapper {
+    background-color: #ffffff;
+    padding: 2.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    border: 1px solid #e2e8f0;
+  }
+  
+  .auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .auth-header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2d3748;
+  }
+  
+  .auth-header p {
+    color: #718096;
+    margin-top: 0.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  .form-group input:focus {
+    outline: none;
+    border-color: #f26722;
+    box-shadow: 0 0 0 2px #fed7c3;
+  }
+  
+  .submit-btn {
+    width: 100%;
+    padding: 0.875rem;
+    background-color: #f26722;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .submit-btn:hover {
+    background-color: #d85b1e;
+  }
+  .submit-btn:disabled {
+    background-color: #fdba74;
+    cursor: not-allowed;
+  }
+  
+  .auth-footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: #718096;
+  }
+  
+  .auth-footer a {
+    color: #f26722;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .auth-footer a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Specific for Register form */
+  .name-group {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  /* Error Messages */
+  .error-message small {
+    color: #e53e3e;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  
+  .server-error-message, .server-success-message {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  .server-error-message {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+  .server-success-message {
+    background-color: #dcfce7;
+    color: #166534;
+  }

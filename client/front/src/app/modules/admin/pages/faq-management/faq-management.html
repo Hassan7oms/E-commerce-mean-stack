@@ -1,0 +1,244 @@
+<div class="faq-management">
+  <!-- Header Section -->
+  <div class="faq-header">
+    <div class="header-content">
+      <h1>FAQ Management</h1>
+      <p>Manage frequently asked questions</p>
+    </div>
+    <button class="create-btn" (click)="openCreateModal()">
+      ➕ Add FAQ
+    </button>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">❓</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ faqStats.total }}</div>
+        <div class="stat-label">Total FAQs</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ faqStats.active }}</div>
+        <div class="stat-label">Active</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">❌</div>
+      <div class="stat-content">
+        <div class="stat-number">{{ faqStats.inactive }}</div>
+        <div class="stat-label">Inactive</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="search-box">
+      <input 
+        type="text" 
+        placeholder="Search FAQs..."
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+      >
+      <button class="search-btn" (click)="onSearch()">🔍</button>
+      <button class="clear-btn" (click)="clearSearch()" *ngIf="searchQuery">✖</button>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading FAQs...</p>
+  </div>
+
+  <!-- FAQs List -->
+  <div *ngIf="!loading" class="faqs-container">
+    <div *ngFor="let faq of faqs" class="faq-card">
+      <div class="faq-header-card">
+        <div class="faq-info">
+          <h3 class="faq-question">{{ faq.question }}</h3>
+          <span class="faq-category">{{ faq.category }}</span>
+        </div>
+        <div class="faq-status">
+          <span 
+            class="status-badge"
+            [class.active]="faq.isActive"
+            [class.inactive]="!faq.isActive"
+          >
+            {{ faq.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="faq-answer">
+        <p>{{ faq.answer }}</p>
+      </div>
+
+      <div class="faq-meta">
+        <span class="faq-date">{{ formatDate(faq.createdAt) }}</span>
+        <div class="faq-actions">
+          <button 
+            class="action-btn edit"
+            (click)="openEditModal(faq)"
+            title="Edit FAQ"
+          >
+            ✏️
+          </button>
+          
+          <button 
+            class="action-btn toggle"
+            (click)="toggleFAQStatus(faq._id)"
+            [title]="faq.isActive ? 'Deactivate' : 'Activate'"
+          >
+            {{ faq.isActive ? '🚫' : '✅' }}
+          </button>
+          
+          <button 
+            class="action-btn delete"
+            (click)="deleteFAQ(faq._id)"
+            title="Delete FAQ"
+          >
+            🗑️
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- No FAQs Message -->
+    <div *ngIf="faqs.length === 0" class="no-faqs">
+      <div class="no-faqs-icon">❓</div>
+      <h3>No FAQs found</h3>
+      <p>No FAQs match your current search.</p>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && faqs.length > 0" class="pagination">
+    <div class="pagination-info">
+      Showing {{ ((currentPage - 1) * itemsPerPage) + 1 }} to 
+      {{ getMinValue(currentPage * itemsPerPage, totalItems) }} of {{ totalItems }} FAQs
+    </div>
+    
+    <div class="pagination-controls">
+      <button 
+        (click)="onPageChange(currentPage - 1)" 
+        [disabled]="currentPage === 1"
+        class="page-btn"
+      >
+        ← Previous
+      </button>
+      
+      <button 
+        *ngFor="let page of getPageNumbers()" 
+        (click)="onPageChange(page)"
+        [class.active]="page === currentPage"
+        class="page-btn"
+      >
+        {{ page }}
+      </button>
+      
+      <button 
+        (click)="onPageChange(currentPage + 1)" 
+        [disabled]="currentPage === totalPages"
+        class="page-btn"
+      >
+        Next →
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ editingFAQ ? 'Edit FAQ' : 'Create New FAQ' }}</h2>
+        <button class="close-btn" (click)="closeModal()">✖</button>
+      </div>
+      
+      <form [formGroup]="faqForm" (ngSubmit)="onSubmit()" class="faq-form">
+        <div class="form-group">
+          <label for="question">Question *</label>
+          <textarea 
+            id="question"
+            formControlName="question"
+            placeholder="Enter the question"
+            rows="2"
+            [class.error]="faqForm.get('question')?.invalid && faqForm.get('question')?.touched"
+          ></textarea>
+          <div *ngIf="faqForm.get('question')?.invalid && faqForm.get('question')?.touched" class="field-error">
+            <span *ngIf="faqForm.get('question')?.errors?.['required']">Question is required</span>
+            <span *ngIf="faqForm.get('question')?.errors?.['minlength']">Question must be at least 10 characters</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="answer">Answer *</label>
+          <textarea 
+            id="answer"
+            formControlName="answer"
+            placeholder="Enter the answer"
+            rows="4"
+            [class.error]="faqForm.get('answer')?.invalid && faqForm.get('answer')?.touched"
+          ></textarea>
+          <div *ngIf="faqForm.get('answer')?.invalid && faqForm.get('answer')?.touched" class="field-error">
+            <span *ngIf="faqForm.get('answer')?.errors?.['required']">Answer is required</span>
+            <span *ngIf="faqForm.get('answer')?.errors?.['minlength']">Answer must be at least 10 characters</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category *</label>
+          <select 
+            id="category"
+            formControlName="category"
+            [class.error]="faqForm.get('category')?.invalid && faqForm.get('category')?.touched"
+          >
+            <option value="">Select a category</option>
+            <option value="General">General</option>
+            <option value="Orders">Orders</option>
+            <option value="Shipping">Shipping</option>
+            <option value="Returns">Returns</option>
+            <option value="Payments">Payments</option>
+            <option value="Account">Account</option>
+          </select>
+          <div *ngIf="faqForm.get('category')?.invalid && faqForm.get('category')?.touched" class="field-error">
+            <span *ngIf="faqForm.get('category')?.errors?.['required']">Category is required</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              formControlName="isActive"
+            >
+            <span class="checkmark"></span>
+            Active FAQ
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" (click)="closeModal()">
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="submit-btn"
+            [disabled]="faqForm.invalid"
+          >
+            {{ editingFAQ ? 'Update' : 'Create' }} FAQ
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

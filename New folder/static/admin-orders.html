@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders Management - NileStyle Admin</title>
+    <link rel="stylesheet" href="admin.css">
+    <style>
+        /* Additional styles for orders page */
+        .status-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .status-modal.hidden {
+            display: none;
+        }
+
+        .status-option {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-align: left;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+            background: var(--background);
+        }
+
+        .status-option:hover {
+            background: var(--muted);
+        }
+
+        .status-option.selected {
+            border-color: var(--primary);
+            background: var(--primary);
+            opacity: 0.1;
+        }
+
+        .order-details {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .order-product-image {
+            width: 3rem;
+            height: 3rem;
+            border-radius: var(--radius);
+            object-fit: cover;
+            background: var(--muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <a href="admin.html" class="sidebar-logo">
+                    <div class="sidebar-logo-icon">NS</div>
+                    <span>NileStyle Admin</span>
+                </a>
+            </div>
+
+            <!-- Sidebar Navigation -->
+            <nav class="sidebar-nav">
+                <!-- Main Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="admin.html" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="9"></rect>
+                            <rect x="14" y="3" width="7" height="5"></rect>
+                            <rect x="14" y="12" width="7" height="9"></rect>
+                            <rect x="3" y="16" width="7" height="5"></rect>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="admin-orders.html" class="nav-link active">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                            <path d="M3 6h18"></path>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                        Orders
+                        <span class="nav-badge">12</span>
+                    </a>
+                    <a href="#" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Customers
+                        <span class="nav-badge">23</span>
+                    </a>
+                </div>
+
+                <!-- Catalog Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Catalog</div>
+                    <a href="#" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                        Products
+                    </a>
+                    <a href="admin-testimonials.html" class="nav-link">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                        Testimonials
+                        <span class="nav-badge">5</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="admin-header">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+
+                <div class="header-left">
+                    <h1>Orders Management</h1>
+                    <p>Manage customer orders and update their status</p>
+                </div>
+
+                <div class="header-right">
+                    <div class="header-search">
+                        <svg class="header-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" placeholder="Search orders, products, customers...">
+                    </div>
+
+                    <div class="header-actions">
+                        <button class="header-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            <span class="notification-badge"></span>
+                        </button>
+
+                        <div class="user-menu">
+                            <div class="user-avatar">HM</div>
+                            <div class="user-info">
+                                <div class="user-name">Hassan Mohamed</div>
+                                <div class="user-role">Admin</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Total Orders</div>
+                            <div class="stat-icon orders">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">126</div>
+                        <div class="stat-change positive">All time</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Pending</div>
+                            <div class="stat-icon" style="background: var(--warning); color: var(--warning-foreground);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12,6 12,12 16,14"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">3</div>
+                        <div class="stat-change">Awaiting processing</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Processing</div>
+                            <div class="stat-icon" style="background: var(--primary); color: var(--primary-foreground);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">8</div>
+                        <div class="stat-change">Being prepared</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Shipped</div>
+                            <div class="stat-icon" style="background: var(--terracotta); color: var(--background);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 18V6a2 2 0 0 0-2-2c-1.1 0-2 .9-2 2v12"></path>
+                                    <path d="M15 18H9"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">15</div>
+                        <div class="stat-change">In transit</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Completed</div>
+                            <div class="stat-icon" style="background: var(--success); color: var(--success-foreground);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20,6 9,17 4,12"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">98</div>
+                        <div class="stat-change positive">Successfully delivered</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Rejected</div>
+                            <div class="stat-icon" style="background: var(--destructive); color: var(--destructive-foreground);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-value">2</div>
+                        <div class="stat-change">Cancelled orders</div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="card" style="margin-bottom: 2rem;">
+                    <div class="card-content">
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <div style="flex: 1; position: relative;">
+                                    <svg style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--muted-foreground); width: 1rem; height: 1rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <path d="m21 21-4.35-4.35"></path>
+                                    </svg>
+                                    <input type="text" id="searchInput" placeholder="Search by order ID, customer name, or product..." style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--background);">
+                                </div>
+                                <select id="statusFilter" style="padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--background);">
+                                    <option value="all">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="preparing">Preparing</option>
+                                    <option value="ready_for_shipping">Ready for Shipping</option>
+                                    <option value="shipped">Shipped</option>
+                                    <option value="received">Received</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div>
+                            <h3 class="card-title">Orders</h3>
+                            <p class="card-description">Manage customer orders and their status</p>
+                        </div>
+                        <div class="table-actions">
+                            <button class="btn btn-outline">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7,10 12,15 17,10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Order</th>
+                                <th>Customer</th>
+                                <th>Product</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <tr data-status="pending">
+                                <td>
+                                    <div>
+                                        <div style="font-weight: 600;">#2456</div>
+                                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">2024-12-15</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <div style="font-weight: 500;">Sarah Ahmed</div>
+                                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">sarah@example.com</div>
+                                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">+20 123 456 789</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="order-details">
+                                        <img src="https://via.placeholder.com/48x48/f0f0f0/cccccc?text=Shirt" alt="Elegant Casual Shirt" class="order-product-image">
+                                        <div>
+                                            <div style="font-weight: 500;">Elegant Casual Shirt</div>
+                                            <div style="font-size: 0.875rem; color: var(--muted-foreground);">Women • Shirts</div>
+                                            <div style="font-size: 0.875rem; color: var(--muted-foreground);">Size: M • Qty: 1</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 600;">549 EGP</div>
+                                    <div style="font-size: 0.875rem; color: var(--muted-foreground);">Credit Card</div>
+                                </td>
+                                <td>
+                                    <span class="badge pending">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.25rem;">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polyline points="12,6 12,12 16,14"></polyline>
+                                        </svg>
+                                        Pending
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="openStatusModal('#2456', 'pending', 'Sarah Ahmed', 'Elegant Casual Shirt')">
+                                        Change Status
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr data-status="preparing">
+                                <td>
+                                    <div>
+                                        <div style="font-weight: 600;">#2455</div>
+                                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">2024-12-14</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <div style="font-weight: 500;">Mohamed Hassan</div>
+                                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">mohamed@example.com</div>
+                                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">+20 987 654 321</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="order-details">
+                                        <img src="https://via.placeholder.com/48x48/f0f0f0/cccccc?text=T-Shirt" alt="Classic Cotton T-Shirt" class="order-product-image">
+                                        <div>
+                                            <div style="font-weight: 500;">Classic Cotton T-Shirt</div>
+                                            <div style="font-size: 0.875rem; color: var(--muted-foreground);">Men • T-Shirts</div>
+                                            <div style="font-size: 0.875rem; color: var(--muted-foreground);">Size: L • Qty: 2</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 600;">598 EGP</div>
+                                    <div style="font-size: 0.875rem; color: var(--muted-foreground);">Cash on Delivery</div>
+                                </td>
+                                <td>
+                                    <span class="badge processing">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.25rem;">
+                                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                        </svg>
+                                        Preparing
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="openStatusModal('#2455', 'preparing', 'Mohamed Hassan', 'Classic Cotton T-Shirt')">
+                                        Change Status
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr data-status="shipped">
+                                <td>
+                                    <div>
+                                        <div style="font-weight: 600;">#2454</div>
+                                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">2024-12-13</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <div style="font-weight: 500;">Fatma Ali</div>
+                                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">fatma@example.com</div>
+                                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">+20 555 123 456</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="order-details">
+                                        <img src="https://via.placeholder.com/48x48/f0f0f0/cccccc?text=Pants" alt="Stylish Palazzo Pants" class="order-product-image">
+                                        <div>
+                                            <div style="font-weight: 500;">Stylish Palazzo Pants</div>
+                                            <div style="font-size: 0.875rem; color: var(--muted-foreground);">Women • Pants</div>
+                                            <div style="font-size: 0.875rem; color: var(--muted-foreground);">Size: S • Qty: 1</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 600;">749 EGP</div>
+                                    <div style="font-size: 0.875rem; color: var(--muted-foreground);">Credit Card</div>
+                                </td>
+                                <td>
+                                    <span class="badge completed" style="background: var(--terracotta); color: var(--background);">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.25rem;">
+                                            <path d="M14 18V6a2 2 0 0 0-2-2c-1.1 0-2 .9-2 2v12"></path>
+                                        </svg>
+                                        Shipped
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="openStatusModal('#2454', 'shipped', 'Fatma Ali', 'Stylish Palazzo Pants')">
+                                        Change Status
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Status Change Modal -->
+    <div id="statusModal" class="status-modal hidden">
+        <div class="card" style="max-width: 28rem; width: 100%;">
+            <div class="card-header">
+                <h3 class="card-title" id="modalTitle">Change Order Status</h3>
+                <p class="card-description" id="modalDescription">Update the status of this order</p>
+            </div>
+            <div class="card-content">
+                <div id="statusOptions">
+                    <!-- Status options will be populated by JavaScript -->
+                </div>
+                <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button onclick="closeStatusModal()" class="btn btn-outline" style="flex: 1;">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentOrderId = '';
+        let currentStatus = '';
+
+        // Status options with descriptions
+        const statusOptions = {
+            pending: { 
+                label: 'Pending', 
+                description: 'Order received, waiting for processing',
+                icon: '<circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline>'
+            },
+            preparing: { 
+                label: 'Preparing', 
+                description: 'Order is being prepared for shipment',
+                icon: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>'
+            },
+            ready_for_shipping: { 
+                label: 'Ready for Shipping', 
+                description: 'Order is ready to be shipped',
+                icon: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>'
+            },
+            shipped: { 
+                label: 'Shipped', 
+                description: 'Order has been shipped to customer',
+                icon: '<path d="M14 18V6a2 2 0 0 0-2-2c-1.1 0-2 .9-2 2v12"></path><path d="M15 18H9"></path>'
+            },
+            received: { 
+                label: 'Received', 
+                description: 'Order has been received by customer',
+                icon: '<polyline points="20,6 9,17 4,12"></polyline>'
+            },
+            rejected: { 
+                label: 'Rejected', 
+                description: 'Order has been rejected or cancelled',
+                icon: '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>'
+            }
+        };
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Open status change modal
+        function openStatusModal(orderId, status, customerName, productName) {
+            currentOrderId = orderId;
+            currentStatus = status;
+            
+            document.getElementById('modalTitle').textContent = `Change Order Status - ${orderId}`;
+            document.getElementById('modalDescription').innerHTML = `
+                Customer: ${customerName}<br>
+                Product: ${productName}<br>
+                Current Status: ${statusOptions[status].label}
+            `;
+            
+            const statusOptionsContainer = document.getElementById('statusOptions');
+            statusOptionsContainer.innerHTML = '';
+            
+            Object.keys(statusOptions).forEach(statusKey => {
+                const option = statusOptions[statusKey];
+                const isSelected = statusKey === status;
+                
+                const statusOption = document.createElement('button');
+                statusOption.className = `status-option ${isSelected ? 'selected' : ''}`;
+                statusOption.onclick = () => updateOrderStatus(statusKey);
+                statusOption.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        ${option.icon}
+                    </svg>
+                    <div>
+                        <div style="font-weight: 500;">${option.label}</div>
+                        <div style="font-size: 0.875rem; color: var(--muted-foreground);">${option.description}</div>
+                    </div>
+                `;
+                
+                statusOptionsContainer.appendChild(statusOption);
+            });
+            
+            document.getElementById('statusModal').classList.remove('hidden');
+        }
+
+        // Close status modal
+        function closeStatusModal() {
+            document.getElementById('statusModal').classList.add('hidden');
+        }
+
+        // Update order status
+        function updateOrderStatus(newStatus) {
+            if (newStatus === currentStatus) {
+                closeStatusModal();
+                return;
+            }
+            
+            // Find the row and update the status
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const orderIdCell = row.querySelector('td:first-child div:first-child');
+                if (orderIdCell && orderIdCell.textContent === currentOrderId) {
+                    row.setAttribute('data-status', newStatus);
+                    
+                    // Update the status badge
+                    const statusCell = row.querySelector('td:nth-child(5)');
+                    const option = statusOptions[newStatus];
+                    
+                    let badgeClass = 'badge ';
+                    switch(newStatus) {
+                        case 'pending':
+                            badgeClass += 'pending';
+                            break;
+                        case 'preparing':
+                        case 'ready_for_shipping':
+                            badgeClass += 'processing';
+                            break;
+                        case 'shipped':
+                            badgeClass = 'badge completed';
+                            statusCell.innerHTML = `<span class="${badgeClass}" style="background: var(--terracotta); color: var(--background);">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.25rem;">
+                                    ${option.icon}
+                                </svg>
+                                ${option.label}
+                            </span>`;
+                            closeStatusModal();
+                            return;
+                        case 'received':
+                            badgeClass += 'completed';
+                            break;
+                        case 'rejected':
+                            badgeClass += 'cancelled';
+                            break;
+                    }
+                    
+                    statusCell.innerHTML = `<span class="${badgeClass}">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.25rem;">
+                            ${option.icon}
+                        </svg>
+                        ${option.label}
+                    </span>`;
+                }
+            });
+            
+            closeStatusModal();
+        }
+
+        // Search and filter functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            filterOrders();
+        });
+
+        document.getElementById('statusFilter').addEventListener('change', function() {
+            filterOrders();
+        });
+
+        function filterOrders() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const rows = document.querySelectorAll('#ordersTableBody tr');
+            
+            rows.forEach(row => {
+                const orderText = row.textContent.toLowerCase();
+                const rowStatus = row.getAttribute('data-status');
+                
+                const matchesSearch = orderText.includes(searchTerm);
+                const matchesStatus = statusFilter === 'all' || rowStatus === statusFilter;
+                
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('statusModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeStatusModal();
+            }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (window.innerWidth <= 1024) {
+                if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
